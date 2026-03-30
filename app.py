@@ -51,6 +51,9 @@ if "ver_carrito" not in st.session_state:
 if "mostrar_mensaje_final" not in st.session_state:
     st.session_state["mostrar_mensaje_final"] = False
 
+if "productos_cacheados" not in st.session_state:
+    st.session_state["productos_cacheados"] = []
+
 # =========================
 # LOGIN SIMPLE
 # =========================
@@ -145,17 +148,13 @@ def extraer_peso(nombre_producto):
 @st.cache_data(ttl=3600)
 def obtener_productos_proveedor():
     url = "https://animalshop.ennube.ar/lista/mayor/"
-
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
+    headers = {"User-Agent": "Mozilla/5.0"}
 
     response = requests.get(url, headers=headers, timeout=15)
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
     texto = soup.get_text("\n")
-
     lineas = [line.strip() for line in texto.split("\n") if line.strip()]
 
     productos = []
@@ -471,16 +470,22 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# DATOS DEL PROVEEDOR
+# CARGA INICIAL DE PRODUCTOS (OPTIMIZADA)
 # =========================
-try:
-    productos = obtener_productos_proveedor()
-    if productos and st.session_state.get("ultima_actualizacion") is None:
-        st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
-except Exception as e:
-    st.error(f"No se pudo cargar la lista del proveedor: {e}")
-    productos = []
+if not st.session_state["productos_cacheados"]:
+    try:
+        st.session_state["productos_cacheados"] = obtener_productos_proveedor()
+        if st.session_state["productos_cacheados"] and st.session_state.get("ultima_actualizacion") is None:
+            st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
+    except Exception as e:
+        st.error(f"No se pudo cargar la lista del proveedor: {e}")
+        st.session_state["productos_cacheados"] = []
 
+productos = st.session_state["productos_cacheados"]
+
+# =========================
+# REGLAS
+# =========================
 reglas_iniciales = pd.DataFrame([
     {"Desde kg": 1.0, "Hasta kg": 2.0, "Incremento": 2000},
     {"Desde kg": 3.0, "Hasta kg": 5.0, "Incremento": 3000},
@@ -540,6 +545,8 @@ with col1:
     if st.button("🔄 Actualizar precios", use_container_width=True):
         with st.spinner("Actualizando lista de precios..."):
             st.cache_data.clear()
+            nuevos_productos = obtener_productos_proveedor()
+            st.session_state["productos_cacheados"] = nuevos_productos
             st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
         st.success("Lista del proveedor actualizada correctamente")
         st.rerun()
@@ -575,6 +582,13 @@ st.markdown("<br>", unsafe_allow_html=True)
 # =========================
 if busqueda:
     df_productos = df_productos[df_productos["Producto"].str.contains(busqueda, case=False, na=False)]
+
+df_productos = df_productos.sort_values("Producto")
+
+# 🔥 OPTIMIZACIÓN CLAVE:
+# si no busca nada, mostramos solo los primeros 30
+if not busqueda:
+    df_productos = df_productos.head(30)
 
 # =========================
 # SECCIÓN REGLAS
@@ -729,9 +743,7 @@ for i, row in df_productos.iterrows():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    mensaje = f"🐾 {row['Producto']}\n💲 Precio: {formato_pesos(row['Venta'])}"
-
-    col_msg1, col_msg2, col_msg3 = st.columns([1.2, 1.2, 3.6])
+    col_msg1, col_msg2 = st.columns([1.2, 5])
 
     with col_msg1:
         if st.button("➕ Agregar", key=f"agregar_{i}", use_container_width=True):
@@ -739,16 +751,6 @@ for i, row in df_productos.iterrows():
             st.toast(f"Agregado al carrito: {row['Producto']}")
 
     with col_msg2:
-        if st.button("📋 Individual", key=f"copiar_{i}", use_container_width=True):
-            st.session_state[f"mostrar_mensaje_{i}"] = True
-
-    with col_msg3:
-        if st.session_state.get(f"mostrar_mensaje_{i}", False):
-            st.text_area(
-                "Copiá este texto y pegalo en WhatsApp:",
-                value=mensaje,
-                height=85,
-                key=f"mensaje_{i}"
-            )
+        st.caption("Agregá al carrito para generar el mensaje final")
 
     st.markdown('</div>', unsafe_allow_html=True)
