@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import math
+from datetime import datetime
 
 # =========================
 # CONFIGURACIÓN DE PÁGINA
@@ -13,6 +14,7 @@ st.set_page_config(
     page_icon="🐾",
     layout="wide"
 )
+
 # =========================
 # LOGIN SIMPLE
 # =========================
@@ -27,6 +29,16 @@ if "logueado" not in st.session_state:
 
 if "mostrar_cambio" not in st.session_state:
     st.session_state["mostrar_cambio"] = False
+
+if "ultima_actualizacion" not in st.session_state:
+    st.session_state["ultima_actualizacion"] = None
+
+if "seleccionados" not in st.session_state:
+    st.session_state["seleccionados"] = []
+
+if "mostrar_reglas" not in st.session_state:
+    st.session_state["mostrar_reglas"] = False
+
 
 def pantalla_login():
     st.markdown("## 🔐 Iniciar sesión")
@@ -46,6 +58,7 @@ def pantalla_login():
             else:
                 st.error("Usuario o contraseña incorrectos")
 
+
 def pantalla_cambiar_password():
     st.markdown("### 🔑 Cambiar contraseña")
 
@@ -58,6 +71,8 @@ def pantalla_cambiar_password():
             st.success("Contraseña actualizada correctamente")
         else:
             st.error("La contraseña actual es incorrecta")
+
+
 # =========================
 # BLOQUEO DE ACCESO
 # =========================
@@ -65,14 +80,6 @@ if not st.session_state["logueado"]:
     pantalla_login()
     st.stop()
 
-# =========================
-# CONFIGURACIÓN DE PÁGINA
-# =========================
-st.set_page_config(
-    page_title="Valentín Pet Food",
-    page_icon="🐾",
-    layout="wide"
-)
 
 # =========================
 # FUNCIONES AUXILIARES
@@ -80,8 +87,10 @@ st.set_page_config(
 def formato_pesos(valor):
     return f"$ {int(valor):,}".replace(",", ".")
 
+
 def redondear_a_1000_superior(valor):
     return math.ceil(valor / 1000) * 1000
+
 
 def obtener_margen(peso, reglas_df):
     for _, regla in reglas_df.iterrows():
@@ -89,12 +98,14 @@ def obtener_margen(peso, reglas_df):
             return regla["Incremento"]
     return 0
 
+
 def calcular_precio_venta(costo, peso, reglas_df):
     margen_regla = obtener_margen(peso, reglas_df)
     venta_base = costo + margen_regla
     venta_redondeada = redondear_a_1000_superior(venta_base)
     ganancia_real = venta_redondeada - costo
     return ganancia_real, venta_redondeada
+
 
 def extraer_peso(nombre_producto):
     """
@@ -124,6 +135,7 @@ def extraer_peso(nombre_producto):
 
     return 0.0
 
+
 @st.cache_data(ttl=3600)
 def obtener_productos_proveedor():
     url = "https://animalshop.ennube.ar/lista/mayor/"
@@ -132,7 +144,7 @@ def obtener_productos_proveedor():
         "User-Agent": "Mozilla/5.0"
     }
 
-    response = requests.get(url, headers=headers, timeout=30)
+    response = requests.get(url, headers=headers, timeout=15)
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -179,6 +191,30 @@ def obtener_productos_proveedor():
             productos_unicos.append(p)
 
     return productos_unicos
+
+
+def agregar_producto_seleccionado(producto, venta):
+    item = {"Producto": producto, "Venta": int(venta)}
+    if item not in st.session_state["seleccionados"]:
+        st.session_state["seleccionados"].append(item)
+
+
+def quitar_producto_seleccionado(producto):
+    st.session_state["seleccionados"] = [
+        x for x in st.session_state["seleccionados"] if x["Producto"] != producto
+    ]
+
+
+def generar_mensaje_multiple(items):
+    if not items:
+        return ""
+
+    lineas = ["Hola 😊 Te paso los productos consultados:", ""]
+    for item in items:
+        lineas.append(f"🐾 {item['Producto']} - {formato_pesos(item['Venta'])}")
+
+    return "\n".join(lineas)
+
 
 # =========================
 # ESTILOS PERSONALIZADOS
@@ -336,6 +372,15 @@ st.markdown("""
             margin-bottom: 18px;
         }
 
+        .seleccion-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid #E5E7EB;
+        }
+
         div.stButton > button {
             border-radius: 14px;
             font-weight: 600;
@@ -345,6 +390,10 @@ st.markdown("""
         div.stTextInput > div > div > input {
             border-radius: 14px;
         }
+
+        textarea {
+            border-radius: 14px !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -353,6 +402,8 @@ st.markdown("""
 # =========================
 try:
     productos = obtener_productos_proveedor()
+    if productos and st.session_state.get("ultima_actualizacion") is None:
+        st.session_state["ultima_actualizacion"] = datetime.now().strftime("%d/%m/%Y - %H:%M hs")
 except Exception as e:
     st.error(f"No se pudo cargar la lista del proveedor: {e}")
     productos = []
@@ -366,9 +417,6 @@ reglas_iniciales = pd.DataFrame([
 
 if "reglas" not in st.session_state:
     st.session_state["reglas"] = reglas_iniciales.copy()
-
-if "mostrar_reglas" not in st.session_state:
-    st.session_state["mostrar_reglas"] = False
 
 # =========================
 # CALCULAR VENTAS Y MÁRGENES
@@ -403,18 +451,21 @@ with col_titulo:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
+# ÚLTIMA ACTUALIZACIÓN
+# =========================
+if st.session_state.get("ultima_actualizacion"):
+    st.info(f"🕒 Última actualización: {st.session_state['ultima_actualizacion']}")
+
+# =========================
 # ACCIONES PRINCIPALES
 # =========================
 col1, col2, col3, col4, col5 = st.columns([1.2, 2.4, 1.2, 1.2, 1.2])
-with col4:
-    if st.button("🔑 Cambiar clave", use_container_width=True):
-        st.session_state["mostrar_cambio"] = True
-if st.session_state.get("mostrar_cambio", False):
-    pantalla_cambiar_password()
 
 with col1:
     if st.button("🔄 Actualizar precios", use_container_width=True):
-        st.cache_data.clear()
+        with st.spinner("Actualizando lista de precios..."):
+            st.cache_data.clear()
+            st.session_state["ultima_actualizacion"] = datetime.now().strftime("%d/%m/%Y - %H:%M hs")
         st.success("Lista del proveedor actualizada correctamente")
         st.rerun()
 
@@ -425,12 +476,19 @@ with col3:
     if st.button("⚙️ Reglas", use_container_width=True):
         st.session_state["mostrar_reglas"] = not st.session_state["mostrar_reglas"]
 
-st.markdown("<br>", unsafe_allow_html=True)
+with col4:
+    if st.button("🔑 Cambiar clave", use_container_width=True):
+        st.session_state["mostrar_cambio"] = True
 
 with col5:
     if st.button("🚪 Cerrar sesión", use_container_width=True):
         st.session_state["logueado"] = False
         st.rerun()
+
+if st.session_state.get("mostrar_cambio", False):
+    pantalla_cambiar_password()
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # =========================
 # FILTRO DE BÚSQUEDA
@@ -459,6 +517,52 @@ if st.session_state["mostrar_reglas"]:
     st.markdown("<br>", unsafe_allow_html=True)
 
 # =========================
+# SELECCIÓN MÚLTIPLE
+# =========================
+st.markdown('<div class="seleccion-card">', unsafe_allow_html=True)
+st.markdown("### 🛒 Selección actual")
+
+if st.session_state["seleccionados"]:
+    for idx, item in enumerate(st.session_state["seleccionados"]):
+        col_sel1, col_sel2 = st.columns([5, 1])
+        with col_sel1:
+            st.write(f"• {item['Producto']} — {formato_pesos(item['Venta'])}")
+        with col_sel2:
+            if st.button("❌", key=f"quitar_{idx}"):
+                quitar_producto_seleccionado(item["Producto"])
+                st.rerun()
+
+    mensaje_multiple = generar_mensaje_multiple(st.session_state["seleccionados"])
+
+    st.text_area(
+        "📋 Mensaje generado para WhatsApp:",
+        value=mensaje_multiple,
+        height=180,
+        key="mensaje_multiple"
+    )
+
+    col_multi1, col_multi2 = st.columns(2)
+
+    with col_multi1:
+        st.download_button(
+            "📄 Descargar mensaje",
+            data=mensaje_multiple,
+            file_name="mensaje_whatsapp.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
+
+    with col_multi2:
+        if st.button("🗑 Vaciar selección", use_container_width=True):
+            st.session_state["seleccionados"] = []
+            st.rerun()
+
+else:
+    st.caption("Todavía no agregaste productos.")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================
 # CATÁLOGO
 # =========================
 st.markdown('<div class="catalog-title">📦 Catálogo</div>', unsafe_allow_html=True)
@@ -468,7 +572,6 @@ for i, row in df_productos.iterrows():
 
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
-    # Ahora mostramos: producto + peso + estado + costo + margen + venta
     col_a, col_b, col_c, col_d, col_e, col_f = st.columns([3.2, 1.1, 1.4, 1.6, 1.6, 2.0])
 
     with col_a:
@@ -500,11 +603,11 @@ for i, row in df_productos.iterrows():
 
     with col_e:
         st.markdown(f"""
-        <div class="margen-box">
-            <div class="margen-label">Ganancia</div>
-            <div class="margen-value">{formato_pesos(row["Ganancia"])}</div>
-        </div>
-    """, unsafe_allow_html=True)
+            <div class="margen-box">
+                <div class="margen-label">Ganancia</div>
+                <div class="margen-value">{formato_pesos(row["Ganancia"])}</div>
+            </div>
+        """, unsafe_allow_html=True)
 
     with col_f:
         st.markdown(f"""
@@ -518,13 +621,18 @@ for i, row in df_productos.iterrows():
 
     mensaje = f"🐾 {row['Producto']}\n💲 Precio: {formato_pesos(row['Venta'])}"
 
-    col_msg1, col_msg2 = st.columns([1.2, 4])
+    col_msg1, col_msg2, col_msg3 = st.columns([1.3, 1.3, 3.4])
 
     with col_msg1:
-        if st.button("📋 Preparar mensaje", key=f"copiar_{i}", use_container_width=True):
-            st.session_state[f"mostrar_mensaje_{i}"] = True
+        if st.button("➕ Agregar", key=f"agregar_{i}", use_container_width=True):
+            agregar_producto_seleccionado(row["Producto"], row["Venta"])
+            st.success("Producto agregado")
 
     with col_msg2:
+        if st.button("📋 Individual", key=f"copiar_{i}", use_container_width=True):
+            st.session_state[f"mostrar_mensaje_{i}"] = True
+
+    with col_msg3:
         if st.session_state.get(f"mostrar_mensaje_{i}", False):
             st.text_area(
                 "Copiá este texto y pegalo en WhatsApp:",
