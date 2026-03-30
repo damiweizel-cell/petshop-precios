@@ -72,6 +72,7 @@ def pantalla_login():
             else:
                 st.error("Usuario o contraseña incorrectos")
 
+
 def pantalla_cambiar_password():
     st.markdown("### 🔑 Cambiar contraseña")
 
@@ -85,6 +86,7 @@ def pantalla_cambiar_password():
         else:
             st.error("La contraseña actual es incorrecta")
 
+
 # =========================
 # BLOQUEO DE ACCESO
 # =========================
@@ -92,14 +94,17 @@ if not st.session_state["logueado"]:
     pantalla_login()
     st.stop()
 
+
 # =========================
 # FUNCIONES AUXILIARES
 # =========================
 def formato_pesos(valor):
     return f"$ {int(valor):,}".replace(",", ".")
 
+
 def redondear_a_1000_superior(valor):
     return math.ceil(valor / 1000) * 1000
+
 
 def obtener_margen(peso, reglas_df):
     for _, regla in reglas_df.iterrows():
@@ -107,12 +112,14 @@ def obtener_margen(peso, reglas_df):
             return regla["Incremento"]
     return 0
 
+
 def calcular_precio_venta(costo, peso, reglas_df):
     margen_regla = obtener_margen(peso, reglas_df)
     venta_base = costo + margen_regla
     venta_redondeada = redondear_a_1000_superior(venta_base)
     ganancia_real = venta_redondeada - costo
     return ganancia_real, venta_redondeada
+
 
 def extraer_peso(nombre_producto):
     nombre = nombre_producto.lower().replace(",", ".")
@@ -133,6 +140,7 @@ def extraer_peso(nombre_producto):
                 return 0.0
 
     return 0.0
+
 
 @st.cache_data(ttl=3600)
 def obtener_productos_proveedor():
@@ -190,15 +198,18 @@ def obtener_productos_proveedor():
 
     return productos_unicos
 
+
 def agregar_producto_seleccionado(producto, venta):
     item = {"Producto": producto, "Venta": int(venta)}
     if item not in st.session_state["seleccionados"]:
         st.session_state["seleccionados"].append(item)
 
+
 def quitar_producto_seleccionado(producto):
     st.session_state["seleccionados"] = [
         x for x in st.session_state["seleccionados"] if x["Producto"] != producto
     ]
+
 
 def generar_mensaje_multiple(items):
     if not items:
@@ -210,74 +221,87 @@ def generar_mensaje_multiple(items):
 
     return "\n".join(lineas)
 
+
 # =========================
 # ESTILOS PERSONALIZADOS
 # =========================
 st.markdown("""
     <style>
+        ::selection {
+            background: #93C5FD;
+            color: black;
+        }
+
+        ::-moz-selection {
+            background: #93C5FD;
+            color: black;
+        }
+
         .stApp {
-            background-color: #F6F8FB;
+            background-color: #F3F4F6;
         }
 
         .main .block-container {
             padding-top: 2rem;
             padding-bottom: 2rem;
-            max-width: 1280px;
+            max-width: 1320px;
         }
 
         .header-card {
             background: white;
-            border-radius: 20px;
-            padding: 24px 28px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-            margin-bottom: 25px;
+            border-radius: 24px;
+            padding: 24px 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            margin-bottom: 22px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .section-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: #6B7280;
+        }
+
+        .catalog-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: #111827;
+            margin-top: 8px;
+            margin-bottom: 18px;
         }
 
         .producto-card {
             background: white;
-            border-radius: 18px;
-            padding: 18px 20px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
-            margin-bottom: 16px;
+            border-radius: 22px;
+            padding: 20px 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+            margin-bottom: 18px;
             border: 1px solid #E5E7EB;
         }
 
         .producto-nombre {
             font-size: 22px;
-            font-weight: 700;
-            color: #1F2937;
-            margin-bottom: 4px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 6px;
+            line-height: 1.3;
         }
 
         .producto-meta {
-            font-size: 15px;
+            font-size: 14px;
             color: #6B7280;
-        }
-
-        .badge-aumento {
-            display: inline-block;
-            background-color: #FEF3C7;
-            color: #B45309;
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .badge-normal {
-            display: inline-block;
-            background-color: #E5E7EB;
-            color: #374151;
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 14px;
-            font-weight: 600;
         }
 
         .mini-box {
             background: #F9FAFB;
-            border-radius: 14px;
-            padding: 12px 16px;
+            border-radius: 16px;
+            padding: 12px 14px;
             text-align: center;
             border: 1px solid #E5E7EB;
             min-height: 92px;
@@ -294,15 +318,15 @@ st.markdown("""
 
         .mini-value {
             font-size: 20px;
-            font-weight: 700;
-            color: #1F2937;
+            font-weight: 800;
+            color: #111827;
         }
 
         .margen-box {
             background: #FFF7ED;
             border: 1px solid #FDBA74;
-            border-radius: 14px;
-            padding: 12px 16px;
+            border-radius: 16px;
+            padding: 12px 14px;
             text-align: center;
             min-height: 92px;
             display: flex;
@@ -318,15 +342,15 @@ st.markdown("""
 
         .margen-value {
             font-size: 20px;
-            font-weight: 700;
+            font-weight: 800;
             color: #9A3412;
         }
 
         .venta-box {
-            background: #E8F5E9;
-            border: 2px solid #4CAF50;
-            border-radius: 16px;
-            padding: 12px 16px;
+            background: #ECFDF5;
+            border: 2px solid #22C55E;
+            border-radius: 18px;
+            padding: 12px 14px;
             text-align: center;
             min-height: 92px;
             display: flex;
@@ -336,87 +360,112 @@ st.markdown("""
 
         .venta-label {
             font-size: 13px;
-            color: #2E7D32;
+            color: #166534;
             margin-bottom: 4px;
         }
 
         .venta-value {
             font-size: 30px;
-            font-weight: 800;
-            color: #1B5E20;
+            font-weight: 900;
+            color: #14532D;
         }
 
-        .section-title {
-            font-size: 48px;
-            font-weight: 800;
-            color: #1F2937;
-            margin-bottom: 6px;
-        }
-
-        .section-subtitle {
-            font-size: 20px;
-            color: #6B7280;
-        }
-
-        .catalog-title {
-            font-size: 30px;
-            font-weight: 800;
-            color: #1F2937;
-            margin-top: 10px;
-            margin-bottom: 18px;
+        .badge-normal {
+            display: inline-block;
+            background-color: #E5E7EB;
+            color: #374151;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
         }
 
         .carrito-card {
             background: white;
-            border-radius: 18px;
-            padding: 22px 24px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            border-radius: 24px;
+            padding: 24px 26px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             border: 1px solid #E5E7EB;
+        }
+
+        .carrito-title {
+            font-size: 34px;
+            font-weight: 900;
+            color: #111827;
+            margin-bottom: 18px;
         }
 
         .carrito-item {
             background: #F9FAFB;
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
+            border-radius: 18px;
+            padding: 18px 18px;
+            margin-bottom: 14px;
             border: 1px solid #E5E7EB;
         }
 
+        .carrito-producto {
+            font-size: 20px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .carrito-precio {
+            font-size: 18px;
+            font-weight: 800;
+            color: #166534;
+        }
+
         .total-box {
-            background: #E8F5E9;
-            border: 2px solid #4CAF50;
-            border-radius: 16px;
-            padding: 16px;
+            background: #ECFDF5;
+            border: 2px solid #22C55E;
+            border-radius: 22px;
+            padding: 22px;
             text-align: center;
-            margin-top: 15px;
-            margin-bottom: 20px;
+            margin-top: 16px;
+            margin-bottom: 22px;
         }
 
         .total-label {
             font-size: 14px;
-            color: #2E7D32;
+            color: #166534;
             margin-bottom: 6px;
+            font-weight: 700;
         }
 
         .total-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: #1B5E20;
+            font-size: 36px;
+            font-weight: 900;
+            color: #14532D;
         }
 
         div.stButton > button {
-            border-radius: 14px;
-            font-weight: 600;
-            padding: 0.65rem 1rem;
+            border-radius: 16px;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            border: none;
         }
 
         div.stTextInput > div > div > input {
-            border-radius: 14px;
+            border-radius: 16px;
+            background: white;
+            color: #111827 !important;
+            border: 1px solid #D1D5DB;
         }
 
         textarea {
-            border-radius: 14px !important;
+            border-radius: 16px !important;
+            color: #111827 !important;
+        }
+
+        label, .stTextInput label, .stTextArea label {
+            color: #111827 !important;
+            font-weight: 700 !important;
+        }
+
+        .stAlert {
+            border-radius: 16px !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -464,7 +513,7 @@ col_logo, col_titulo = st.columns([1, 5])
 
 with col_logo:
     try:
-        st.image("assets/logo.png", width=200)
+        st.image("assets/logo.png", width=180)
     except:
         st.write("🐾")
 
@@ -475,7 +524,7 @@ with col_titulo:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
-# ÚLTIMA ACTUALIZACIÓN
+# INFO SUPERIOR
 # =========================
 if st.session_state.get("ultima_actualizacion"):
     st.info(f"🕒 Última actualización: {st.session_state['ultima_actualizacion']}")
@@ -483,7 +532,9 @@ if st.session_state.get("ultima_actualizacion"):
 # =========================
 # ACCIONES PRINCIPALES
 # =========================
-col1, col2, col3, col4, col5, col6 = st.columns([1.2, 2.2, 1.2, 1.2, 1.2, 1.2])
+cantidad_carrito = len(st.session_state["seleccionados"])
+
+col1, col2, col3, col4, col5, col6 = st.columns([1.2, 2.2, 1.2, 1.3, 1.2, 1.2])
 
 with col1:
     if st.button("🔄 Actualizar precios", use_container_width=True):
@@ -494,14 +545,14 @@ with col1:
         st.rerun()
 
 with col2:
-    busqueda = st.text_input("🔎 Buscar producto")
+    busqueda = st.text_input("🔎 Buscar producto", placeholder="Ej: Dog Chow, Excellent, Matute...")
 
 with col3:
     if st.button("⚙️ Reglas", use_container_width=True):
         st.session_state["mostrar_reglas"] = not st.session_state["mostrar_reglas"]
 
 with col4:
-    if st.button("🛒 Ver carrito", use_container_width=True):
+    if st.button(f"🛒 Carrito ({cantidad_carrito})", use_container_width=True):
         st.session_state["ver_carrito"] = True
         st.rerun()
 
@@ -550,7 +601,7 @@ if st.session_state["mostrar_reglas"]:
 # =========================
 if st.session_state["ver_carrito"]:
     st.markdown('<div class="carrito-card">', unsafe_allow_html=True)
-    st.markdown("## 🛒 Carrito de productos")
+    st.markdown('<div class="carrito-title">🛒 Carrito de productos</div>', unsafe_allow_html=True)
 
     if st.session_state["seleccionados"]:
         total = sum([item["Venta"] for item in st.session_state["seleccionados"]])
@@ -561,8 +612,10 @@ if st.session_state["ver_carrito"]:
             col_item1, col_item2 = st.columns([5, 1])
 
             with col_item1:
-                st.write(f"**{item['Producto']}**")
-                st.write(f"💲 {formato_pesos(item['Venta'])}")
+                st.markdown(f"""
+                    <div class="carrito-producto">{item['Producto']}</div>
+                    <div class="carrito-precio">💲 {formato_pesos(item['Venta'])}</div>
+                """, unsafe_allow_html=True)
 
             with col_item2:
                 if st.button("❌", key=f"del_{idx}", use_container_width=True):
@@ -627,11 +680,9 @@ if st.session_state["ver_carrito"]:
 st.markdown('<div class="catalog-title">📦 Catálogo</div>', unsafe_allow_html=True)
 
 for i, row in df_productos.iterrows():
-    badge_class = "badge-aumento" if row["Estado"] == "Aumentó" else "badge-normal"
-
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
-    col_a, col_b, col_c, col_d, col_e, col_f = st.columns([3.2, 1.1, 1.4, 1.6, 1.6, 2.0])
+    col_a, col_b, col_c, col_d, col_e, col_f = st.columns([3.2, 1.1, 1.2, 1.6, 1.6, 2.0])
 
     with col_a:
         st.markdown(f'<div class="producto-nombre">{row["Producto"]}</div>', unsafe_allow_html=True)
@@ -648,7 +699,7 @@ for i, row in df_productos.iterrows():
     with col_c:
         st.markdown(f"""
             <div style="text-align:center; padding-top:18px;">
-                <span class="{badge_class}">{row["Estado"]}</span>
+                <span class="badge-normal">{row["Estado"]}</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -680,7 +731,7 @@ for i, row in df_productos.iterrows():
 
     mensaje = f"🐾 {row['Producto']}\n💲 Precio: {formato_pesos(row['Venta'])}"
 
-    col_msg1, col_msg2, col_msg3 = st.columns([1.3, 1.3, 3.4])
+    col_msg1, col_msg2, col_msg3 = st.columns([1.2, 1.2, 3.6])
 
     with col_msg1:
         if st.button("➕ Agregar", key=f"agregar_{i}", use_container_width=True):
