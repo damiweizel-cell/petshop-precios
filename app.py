@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import math
 from datetime import datetime
+import pytz
 
 # =========================
 # CONFIGURACIÓN DE PÁGINA
@@ -16,7 +17,12 @@ st.set_page_config(
 )
 
 # =========================
-# LOGIN SIMPLE
+# ZONA HORARIA ARGENTINA
+# =========================
+zona = pytz.timezone("America/Argentina/Buenos_Aires")
+
+# =========================
+# SESSION STATE
 # =========================
 if "usuario" not in st.session_state:
     st.session_state["usuario"] = "carolinak"
@@ -39,7 +45,15 @@ if "seleccionados" not in st.session_state:
 if "mostrar_reglas" not in st.session_state:
     st.session_state["mostrar_reglas"] = False
 
+if "ver_carrito" not in st.session_state:
+    st.session_state["ver_carrito"] = False
 
+if "mostrar_mensaje_final" not in st.session_state:
+    st.session_state["mostrar_mensaje_final"] = False
+
+# =========================
+# LOGIN SIMPLE
+# =========================
 def pantalla_login():
     st.markdown("## 🔐 Iniciar sesión")
     st.write("Ingresá con tu usuario y contraseña para acceder a la app.")
@@ -58,7 +72,6 @@ def pantalla_login():
             else:
                 st.error("Usuario o contraseña incorrectos")
 
-
 def pantalla_cambiar_password():
     st.markdown("### 🔑 Cambiar contraseña")
 
@@ -72,7 +85,6 @@ def pantalla_cambiar_password():
         else:
             st.error("La contraseña actual es incorrecta")
 
-
 # =========================
 # BLOQUEO DE ACCESO
 # =========================
@@ -80,24 +92,20 @@ if not st.session_state["logueado"]:
     pantalla_login()
     st.stop()
 
-
 # =========================
 # FUNCIONES AUXILIARES
 # =========================
 def formato_pesos(valor):
     return f"$ {int(valor):,}".replace(",", ".")
 
-
 def redondear_a_1000_superior(valor):
     return math.ceil(valor / 1000) * 1000
-
 
 def obtener_margen(peso, reglas_df):
     for _, regla in reglas_df.iterrows():
         if peso >= regla["Desde kg"] and peso < regla["Hasta kg"]:
             return regla["Incremento"]
     return 0
-
 
 def calcular_precio_venta(costo, peso, reglas_df):
     margen_regla = obtener_margen(peso, reglas_df)
@@ -106,16 +114,7 @@ def calcular_precio_venta(costo, peso, reglas_df):
     ganancia_real = venta_redondeada - costo
     return ganancia_real, venta_redondeada
 
-
 def extraer_peso(nombre_producto):
-    """
-    Intenta detectar automáticamente el peso desde el nombre del producto.
-    Ejemplos:
-    - X 15 Kg
-    - X15kg
-    - X 7,5 Kg
-    - X 1.5 Kg
-    """
     nombre = nombre_producto.lower().replace(",", ".")
 
     patrones = [
@@ -134,7 +133,6 @@ def extraer_peso(nombre_producto):
                 return 0.0
 
     return 0.0
-
 
 @st.cache_data(ttl=3600)
 def obtener_productos_proveedor():
@@ -192,18 +190,15 @@ def obtener_productos_proveedor():
 
     return productos_unicos
 
-
 def agregar_producto_seleccionado(producto, venta):
     item = {"Producto": producto, "Venta": int(venta)}
     if item not in st.session_state["seleccionados"]:
         st.session_state["seleccionados"].append(item)
 
-
 def quitar_producto_seleccionado(producto):
     st.session_state["seleccionados"] = [
         x for x in st.session_state["seleccionados"] if x["Producto"] != producto
     ]
-
 
 def generar_mensaje_multiple(items):
     if not items:
@@ -214,7 +209,6 @@ def generar_mensaje_multiple(items):
         lineas.append(f"🐾 {item['Producto']} - {formato_pesos(item['Venta'])}")
 
     return "\n".join(lineas)
-
 
 # =========================
 # ESTILOS PERSONALIZADOS
@@ -372,13 +366,43 @@ st.markdown("""
             margin-bottom: 18px;
         }
 
-        .seleccion-card {
+        .carrito-card {
             background: white;
             border-radius: 18px;
-            padding: 18px 20px;
+            padding: 22px 24px;
             box-shadow: 0 3px 12px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             border: 1px solid #E5E7EB;
+        }
+
+        .carrito-item {
+            background: #F9FAFB;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .total-box {
+            background: #E8F5E9;
+            border: 2px solid #4CAF50;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+
+        .total-label {
+            font-size: 14px;
+            color: #2E7D32;
+            margin-bottom: 6px;
+        }
+
+        .total-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1B5E20;
         }
 
         div.stButton > button {
@@ -398,12 +422,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# DATOS REALES DEL PROVEEDOR
+# DATOS DEL PROVEEDOR
 # =========================
 try:
     productos = obtener_productos_proveedor()
     if productos and st.session_state.get("ultima_actualizacion") is None:
-        st.session_state["ultima_actualizacion"] = datetime.now().strftime("%d/%m/%Y - %H:%M hs")
+        st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
 except Exception as e:
     st.error(f"No se pudo cargar la lista del proveedor: {e}")
     productos = []
@@ -419,7 +443,7 @@ if "reglas" not in st.session_state:
     st.session_state["reglas"] = reglas_iniciales.copy()
 
 # =========================
-# CALCULAR VENTAS Y MÁRGENES
+# CALCULAR PRECIOS
 # =========================
 for p in productos:
     ganancia_real, venta = calcular_precio_venta(p["Costo"], p["Peso"], st.session_state["reglas"])
@@ -432,7 +456,7 @@ if df_productos.empty:
     st.warning("No se encontraron productos del proveedor.")
 
 # =========================
-# HEADER CON LOGO
+# HEADER
 # =========================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
 
@@ -459,13 +483,13 @@ if st.session_state.get("ultima_actualizacion"):
 # =========================
 # ACCIONES PRINCIPALES
 # =========================
-col1, col2, col3, col4, col5 = st.columns([1.2, 2.4, 1.2, 1.2, 1.2])
+col1, col2, col3, col4, col5, col6 = st.columns([1.2, 2.2, 1.2, 1.2, 1.2, 1.2])
 
 with col1:
     if st.button("🔄 Actualizar precios", use_container_width=True):
         with st.spinner("Actualizando lista de precios..."):
             st.cache_data.clear()
-            st.session_state["ultima_actualizacion"] = datetime.now().strftime("%d/%m/%Y - %H:%M hs")
+            st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
         st.success("Lista del proveedor actualizada correctamente")
         st.rerun()
 
@@ -477,10 +501,15 @@ with col3:
         st.session_state["mostrar_reglas"] = not st.session_state["mostrar_reglas"]
 
 with col4:
+    if st.button("🛒 Ver carrito", use_container_width=True):
+        st.session_state["ver_carrito"] = True
+        st.rerun()
+
+with col5:
     if st.button("🔑 Cambiar clave", use_container_width=True):
         st.session_state["mostrar_cambio"] = True
 
-with col5:
+with col6:
     if st.button("🚪 Cerrar sesión", use_container_width=True):
         st.session_state["logueado"] = False
         st.rerun()
@@ -517,50 +546,80 @@ if st.session_state["mostrar_reglas"]:
     st.markdown("<br>", unsafe_allow_html=True)
 
 # =========================
-# SELECCIÓN MÚLTIPLE
+# PANTALLA CARRITO
 # =========================
-st.markdown('<div class="seleccion-card">', unsafe_allow_html=True)
-st.markdown("### 🛒 Selección actual")
+if st.session_state["ver_carrito"]:
+    st.markdown('<div class="carrito-card">', unsafe_allow_html=True)
+    st.markdown("## 🛒 Carrito de productos")
 
-if st.session_state["seleccionados"]:
-    for idx, item in enumerate(st.session_state["seleccionados"]):
-        col_sel1, col_sel2 = st.columns([5, 1])
-        with col_sel1:
-            st.write(f"• {item['Producto']} — {formato_pesos(item['Venta'])}")
-        with col_sel2:
-            if st.button("❌", key=f"quitar_{idx}"):
-                quitar_producto_seleccionado(item["Producto"])
-                st.rerun()
+    if st.session_state["seleccionados"]:
+        total = sum([item["Venta"] for item in st.session_state["seleccionados"]])
 
-    mensaje_multiple = generar_mensaje_multiple(st.session_state["seleccionados"])
+        for idx, item in enumerate(st.session_state["seleccionados"]):
+            st.markdown('<div class="carrito-item">', unsafe_allow_html=True)
 
-    st.text_area(
-        "📋 Mensaje generado para WhatsApp:",
-        value=mensaje_multiple,
-        height=180,
-        key="mensaje_multiple"
-    )
+            col_item1, col_item2 = st.columns([5, 1])
 
-    col_multi1, col_multi2 = st.columns(2)
+            with col_item1:
+                st.write(f"**{item['Producto']}**")
+                st.write(f"💲 {formato_pesos(item['Venta'])}")
 
-    with col_multi1:
-        st.download_button(
-            "📄 Descargar mensaje",
-            data=mensaje_multiple,
-            file_name="mensaje_whatsapp.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
+            with col_item2:
+                if st.button("❌", key=f"del_{idx}", use_container_width=True):
+                    quitar_producto_seleccionado(item["Producto"])
+                    st.rerun()
 
-    with col_multi2:
-        if st.button("🗑 Vaciar selección", use_container_width=True):
-            st.session_state["seleccionados"] = []
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(f"""
+            <div class="total-box">
+                <div class="total-label">TOTAL ESTIMADO</div>
+                <div class="total-value">{formato_pesos(total)}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        if st.button("📋 Generar mensaje", use_container_width=True):
+            st.session_state["mostrar_mensaje_final"] = True
+
+        if st.session_state["mostrar_mensaje_final"]:
+            mensaje_final = generar_mensaje_multiple(st.session_state["seleccionados"])
+
+            st.text_area(
+                "Mensaje listo para WhatsApp:",
+                value=mensaje_final,
+                height=220,
+                key="mensaje_final_area"
+            )
+
+            st.download_button(
+                "📄 Descargar mensaje",
+                data=mensaje_final,
+                file_name="mensaje_whatsapp.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+
+    else:
+        st.info("El carrito está vacío.")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    col_back1, col_back2 = st.columns(2)
+
+    with col_back1:
+        if st.button("⬅️ Volver al catálogo", use_container_width=True):
+            st.session_state["ver_carrito"] = False
+            st.session_state["mostrar_mensaje_final"] = False
             st.rerun()
 
-else:
-    st.caption("Todavía no agregaste productos.")
+    with col_back2:
+        if st.button("🗑 Vaciar carrito", use_container_width=True):
+            st.session_state["seleccionados"] = []
+            st.session_state["mostrar_mensaje_final"] = False
+            st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.stop()
 
 # =========================
 # CATÁLOGO
@@ -626,7 +685,7 @@ for i, row in df_productos.iterrows():
     with col_msg1:
         if st.button("➕ Agregar", key=f"agregar_{i}", use_container_width=True):
             agregar_producto_seleccionado(row["Producto"], row["Venta"])
-            st.success("Producto agregado")
+            st.toast(f"Agregado al carrito: {row['Producto']}")
 
     with col_msg2:
         if st.button("📋 Individual", key=f"copiar_{i}", use_container_width=True):
