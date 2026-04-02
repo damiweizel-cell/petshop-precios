@@ -44,172 +44,241 @@ IMAGENES_PRODUCTOS = {
 }
 
 # =========================
-# ESTILOS VISUALES
+# ESTILOS MOBILE-FIRST
 # =========================
 st.markdown("""
     <style>
+        /* ===== Fondo general ===== */
         .stApp {
-            background: linear-gradient(180deg, #F8FAFC 0%, #EEF6FF 45%, #F1F5F9 100%);
+            background: linear-gradient(180deg, #0F172A 0%, #111827 45%, #1E293B 100%);
+            color: #F8FAFC;
         }
 
         .main .block-container {
-            padding-top: 1.5rem;
+            max-width: 1200px;
+            padding-top: 1rem;
             padding-bottom: 2rem;
-            max-width: 1320px;
         }
 
+        /* ===== Tipografía general ===== */
+        h1, h2, h3, h4, h5, h6, p, span, label, div {
+            color: #F8FAFC;
+        }
+
+        /* ===== Header ===== */
         .header-card {
-            background: linear-gradient(135deg, #DBEAFE 0%, #EFF6FF 100%);
-            border-radius: 30px;
-            padding: 26px 30px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
-            margin-bottom: 20px;
-            border: 1px solid #BFDBFE;
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border-radius: 28px;
+            padding: 22px 22px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
             position: relative;
             overflow: hidden;
         }
 
         .header-card::before {
-            content: "🐾 🐾 🐾";
+            content: "🐾";
             position: absolute;
-            right: 26px;
-            top: 18px;
-            font-size: 34px;
-            opacity: 0.10;
+            right: 22px;
+            top: 10px;
+            font-size: 90px;
+            opacity: 0.06;
         }
 
         .section-title {
-            font-size: 46px;
+            font-size: 42px;
             font-weight: 900;
-            color: #0F172A;
+            color: #F8FAFC;
             margin-bottom: 2px;
-            line-height: 1.1;
+            line-height: 1.05;
         }
 
         .section-subtitle {
-            font-size: 20px;
-            color: #475569;
-            font-weight: 700;
-        }
-
-        .delivery-banner {
-            background: linear-gradient(135deg, #FEF3C7 0%, #FFF7ED 100%);
-            border: 1px solid #FCD34D;
-            border-radius: 22px;
-            padding: 16px 22px;
-            font-size: 22px;
-            font-weight: 900;
-            color: #92400E;
-            text-align: center;
-            margin-bottom: 18px;
-            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.10);
-        }
-
-        .info-banner {
-            background: linear-gradient(135deg, #DBEAFE 0%, #EAF3FF 100%);
-            border-radius: 20px;
-            padding: 18px 22px;
-            border: 1px solid #BFDBFE;
-            margin-bottom: 18px;
             font-size: 18px;
+            color: #CBD5E1;
             font-weight: 700;
-            color: #1D4ED8;
         }
 
-        .producto-card {
-            background: white;
-            border-radius: 24px;
-            padding: 20px;
+        /* ===== Banner entrega ===== */
+        .delivery-banner {
+            background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%);
+            border-radius: 22px;
+            padding: 16px 18px;
+            font-size: 20px;
+            font-weight: 900;
+            color: #111827;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 24px rgba(245, 158, 11, 0.25);
+        }
+
+        /* ===== Banner info ===== */
+        .info-banner {
+            background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%);
+            border-radius: 18px;
+            padding: 16px 18px;
             margin-bottom: 18px;
-            border: 1px solid #E5E7EB;
-            box-shadow: 0 10px 24px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
+            font-size: 17px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+        }
+
+        /* ===== Títulos secciones ===== */
+        .titulo-seccion {
+            font-size: 20px;
+            font-weight: 900;
+            color: #F8FAFC;
+            margin-top: 12px;
+            margin-bottom: 10px;
+        }
+
+        /* ===== Cards producto ===== */
+        .producto-card {
+            background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.28);
         }
 
         .producto-nombre {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 900;
-            color: #111827;
-            line-height: 1.25;
-            margin-bottom: 8px;
+            color: #F9FAFB;
+            line-height: 1.2;
+            margin-bottom: 10px;
         }
 
         .precio-cliente {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 900;
-            color: #15803D;
-            background-color: #DCFCE7;
-            padding: 12px 18px;
+            color: #052E16;
+            background: linear-gradient(135deg, #86EFAC 0%, #22C55E 100%);
+            padding: 12px 16px;
             border-radius: 18px;
             text-align: center;
             display: inline-block;
-            min-width: 160px;
-            box-shadow: 0 6px 16px rgba(34,197,94,0.18);
+            min-width: 150px;
+            box-shadow: 0 8px 18px rgba(34,197,94,0.25);
         }
 
+        /* ===== Carrito ===== */
         .carrito-item {
-            background: #FFFFFF;
-            border: 1px solid #E5E7EB;
+            background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 20px;
-            padding: 18px;
+            padding: 16px;
             margin-bottom: 14px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.24);
         }
 
         .carrito-total {
-            background: #ECFDF5;
-            border: 2px solid #22C55E;
-            border-radius: 22px;
-            padding: 22px;
+            background: linear-gradient(135deg, #14532D 0%, #166534 100%);
+            border-radius: 24px;
+            padding: 20px;
             text-align: center;
             margin-top: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 24px rgba(34,197,94,0.12);
+            box-shadow: 0 12px 26px rgba(22, 101, 52, 0.30);
         }
 
         .carrito-total-label {
             font-size: 15px;
             font-weight: 800;
-            color: #166534;
+            color: #DCFCE7;
         }
 
         .carrito-total-value {
             font-size: 42px;
             font-weight: 900;
-            color: #14532D;
+            color: #F0FDF4;
         }
 
-        .carrito-destacado {
-            background: linear-gradient(135deg, #DCFCE7 0%, #F0FDF4 100%);
-            border: 2px solid #22C55E;
-            color: #166534 !important;
-            font-weight: 900 !important;
-            box-shadow: 0 8px 18px rgba(34,197,94,0.15);
-        }
-
-        .subtle-label {
-            font-size: 15px;
-            font-weight: 700;
-            color: #64748B;
-            margin-bottom: 4px;
-        }
-
-        div.stButton > button {
-            border-radius: 16px;
-            font-weight: 800;
-            padding: 0.75rem 1rem;
-            border: none;
-        }
-
+        /* ===== Inputs ===== */
         div.stTextInput > div > div > input {
-            border-radius: 16px;
-            background: white;
+            border-radius: 18px !important;
+            background: #F8FAFC !important;
             color: #111827 !important;
-            border: 1px solid #CBD5E1;
+            border: none !important;
+            min-height: 52px;
+            font-size: 17px !important;
         }
 
-        div[data-testid="stNumberInput"] input {
-            border-radius: 14px !important;
+        div[data-testid="stNumberInput"] input,
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+            border-radius: 16px !important;
+            min-height: 50px !important;
+            font-size: 16px !important;
+        }
+
+        /* ===== Botones ===== */
+        div.stButton > button {
+            border-radius: 18px !important;
+            font-weight: 900 !important;
+            padding: 0.80rem 1rem !important;
+            border: none !important;
+            min-height: 52px !important;
+            font-size: 16px !important;
+        }
+
+        div[data-testid="stLinkButton"] a {
+            border-radius: 18px !important;
+            font-weight: 900 !important;
+            min-height: 54px !important;
+            font-size: 17px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        /* ===== Labels ===== */
+        label, .stSelectbox label, .stTextInput label {
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            color: #E2E8F0 !important;
+        }
+
+        /* ===== Responsive móvil ===== */
+        @media (max-width: 768px) {
+            .main .block-container {
+                padding-top: 0.8rem;
+                padding-left: 0.8rem;
+                padding-right: 0.8rem;
+                padding-bottom: 2rem;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .section-subtitle {
+                font-size: 16px;
+            }
+
+            .producto-nombre {
+                font-size: 20px;
+            }
+
+            .precio-cliente {
+                font-size: 26px;
+                min-width: 135px;
+            }
+
+            .delivery-banner {
+                font-size: 18px;
+                padding: 14px 16px;
+            }
+
+            .info-banner {
+                font-size: 15px;
+            }
+
+            .carrito-total-value {
+                font-size: 34px;
+            }
         }
     </style>
 """, unsafe_allow_html=True)
@@ -236,9 +305,6 @@ if "cliente_seleccionados" not in st.session_state:
 
 if "cliente_ver_carrito" not in st.session_state:
     st.session_state["cliente_ver_carrito"] = False
-
-if "cliente_nombre" not in st.session_state:
-    st.session_state["cliente_nombre"] = ""
 
 # =========================
 # FUNCIONES CARRITO
@@ -268,11 +334,11 @@ def total_items_carrito():
     return sum(item["Cantidad"] for item in st.session_state["cliente_seleccionados"])
 
 
-def generar_mensaje_whatsapp(items, nombre_cliente):
+def generar_mensaje_whatsapp(items):
     if not items:
         return ""
 
-    lineas = [f"Hola soy {nombre_cliente} y necesito hacerte el siguiente pedido:", ""]
+    lineas = ["Hola, necesito hacer un pedido:", ""]
     total = 0
 
     for item in items:
@@ -315,11 +381,11 @@ df = pd.DataFrame(productos)
 # =========================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
 
-col_logo, col_titulo = st.columns([1, 5])
+col_logo, col_titulo = st.columns([1, 4])
 
 with col_logo:
     try:
-        st.image("assets/logo.png", width=155)
+        st.image("assets/logo.png", width=120)
     except:
         st.write("🐾")
 
@@ -340,7 +406,7 @@ if st.session_state["cliente_ultima_actualizacion"]:
 # =========================
 # BUSCADOR + ACCIONES
 # =========================
-col1, col2, col3 = st.columns([3.2, 1, 1])
+col1, col2, col3 = st.columns([3.2, 1.1, 1.1])
 
 with col1:
     busqueda = st.text_input("Buscar producto")
@@ -358,11 +424,10 @@ with col3:
         st.markdown("""
             <style>
                 div[data-testid="column"]:nth-of-type(3) div.stButton > button {
-                    background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%) !important;
-                    color: #166534 !important;
-                    border: 2px solid #22C55E !important;
-                    font-weight: 900 !important;
-                    box-shadow: 0 8px 18px rgba(34,197,94,0.15) !important;
+                    background: linear-gradient(135deg, #86EFAC 0%, #22C55E 100%) !important;
+                    color: #052E16 !important;
+                    border: none !important;
+                    box-shadow: 0 10px 22px rgba(34,197,94,0.28) !important;
                 }
             </style>
         """, unsafe_allow_html=True)
@@ -386,7 +451,7 @@ if not busqueda:
 # CARRITO
 # =========================
 if st.session_state["cliente_ver_carrito"]:
-    st.header("🛒 Mi carrito")
+    st.markdown('<div class="titulo-seccion">🛒 Mi carrito</div>', unsafe_allow_html=True)
 
     if not st.session_state["cliente_seleccionados"]:
         st.info("Todavía no agregaste productos.")
@@ -394,24 +459,13 @@ if st.session_state["cliente_ver_carrito"]:
     else:
         total_general = 0
 
-        st.markdown("### 👤 Tus datos")
-        nombre_cliente = st.text_input(
-            "Nombre",
-            value=st.session_state["cliente_nombre"],
-            placeholder="Escribí tu nombre",
-            key="nombre_cliente_input"
-        )
-        st.session_state["cliente_nombre"] = nombre_cliente
-
-        st.markdown("### 📦 Resumen del pedido")
-
         for idx, item in enumerate(st.session_state["cliente_seleccionados"]):
             subtotal = item["Cantidad"] * item["Venta"]
             total_general += subtotal
 
             st.markdown('<div class="carrito-item">', unsafe_allow_html=True)
 
-            col1, col2, col3, col4 = st.columns([5, 1.3, 1.6, 1])
+            col1, col2, col3, col4 = st.columns([4.5, 1.3, 1.5, 1])
 
             with col1:
                 st.write(f"**{item['Producto']}**")
@@ -449,24 +503,11 @@ if st.session_state["cliente_ver_carrito"]:
             </div>
         """, unsafe_allow_html=True)
 
-        nombre_valido = nombre_cliente.strip() != ""
-
-        if not nombre_valido:
-            st.warning("⚠️ Para enviar el pedido, primero completá tu nombre.")
-
-        mensaje = generar_mensaje_whatsapp(
-            st.session_state["cliente_seleccionados"],
-            nombre_cliente.strip()
-        )
+        mensaje = generar_mensaje_whatsapp(st.session_state["cliente_seleccionados"])
         mensaje_codificado = urllib.parse.quote(mensaje)
 
-        # Tu número de WhatsApp
         whatsapp_url = f"https://wa.me/5491141645510?text={mensaje_codificado}"
-
-        if nombre_valido:
-            st.link_button("📲 Enviar pedido", whatsapp_url, use_container_width=True)
-        else:
-            st.button("📲 Enviar pedido", disabled=True, use_container_width=True)
+        st.link_button("📲 Enviar pedido", whatsapp_url, use_container_width=True)
 
     colv1, colv2 = st.columns(2)
 
@@ -478,7 +519,6 @@ if st.session_state["cliente_ver_carrito"]:
     with colv2:
         if st.button("🗑 Vaciar carrito", use_container_width=True):
             st.session_state["cliente_seleccionados"] = []
-            st.session_state["cliente_nombre"] = ""
             st.rerun()
 
     st.stop()
@@ -486,22 +526,22 @@ if st.session_state["cliente_ver_carrito"]:
 # =========================
 # CATÁLOGO CLIENTE
 # =========================
-st.header("🐶🐱 Productos destacados")
+st.markdown('<div class="titulo-seccion">🐶🐱 Productos destacados</div>', unsafe_allow_html=True)
 
 for i, row in df.iterrows():
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
-    col_img, col1, col2, col3 = st.columns([1.3, 4.6, 1.9, 1.5])
+    col_img, col1, col2, col3 = st.columns([1.2, 4.2, 1.8, 1.6])
 
     with col_img:
         ruta_imagen = IMAGENES_PRODUCTOS.get(row["Producto"], "")
         if ruta_imagen:
             try:
-                st.image(ruta_imagen, width=100)
+                st.image(ruta_imagen, width=95)
             except:
-                st.image("https://placehold.co/100x100?text=Pet", width=100)
+                st.image("https://placehold.co/100x100?text=Pet", width=95)
         else:
-            st.image("https://placehold.co/100x100?text=Pet", width=100)
+            st.image("https://placehold.co/100x100?text=Pet", width=95)
 
     with col1:
         st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
@@ -522,7 +562,7 @@ for i, row in df.iterrows():
 
         if st.button("Agregar", key=f"agregar_cliente_{i}", use_container_width=True):
             agregar_al_carrito(row["Producto"], row["Venta"], cantidad)
-            st.toast(f"✅ {row['Producto']} agregado al carrito")
+            st.toast("✅ Producto agregado")
             st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
