@@ -13,63 +13,46 @@ def obtener_productos_proveedor():
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
+
+    # =========================
+    # 1) OBTENER PRODUCTOS DESDE TEXTO (más estable)
+    # =========================
+    texto = soup.get_text("\n")
+    lineas = [line.strip() for line in texto.split("\n") if line.strip()]
+
     productos = []
+    i = 0
 
-    posibles_productos = soup.find_all(["div", "article", "li"])
+    while i < len(lineas) - 1:
+        nombre = lineas[i]
+        precio = lineas[i + 1]
 
-    for bloque in posibles_productos:
-        texto = bloque.get_text(" ", strip=True)
+        if re.match(r"^\$\s?\d[\d\.]*$", precio):
+            nombre_limpio = nombre.strip()
+            precio_limpio = precio.replace("$", "").replace(" ", "").replace(".", "")
 
-        precio_match = re.search(r"\$\s?([\d\.]+)", texto)
-        if not precio_match:
-            continue
+            try:
+                costo = int(precio_limpio)
+                peso = extraer_peso(nombre_limpio)
 
-        try:
-            costo = int(precio_match.group(1).replace(".", ""))
-        except:
-            continue
+                if len(nombre_limpio) > 5:
+                    productos.append({
+                        "Producto": nombre_limpio,
+                        "Peso": peso,
+                        "Costo": costo,
+                        "Estado": "Actualizado",
+                        "Imagen": ""
+                    })
+            except:
+                pass
 
-        imagen_url = None
-        img_tag = bloque.find("img")
-        if img_tag:
-            imagen_url = (
-                img_tag.get("src")
-                or img_tag.get("data-src")
-                or img_tag.get("data-original")
-                or img_tag.get("srcset")
-            )
+            i += 2
+        else:
+            i += 1
 
-            if imagen_url:
-                if "," in imagen_url:
-                    imagen_url = imagen_url.split(",")[0].strip().split(" ")[0]
-
-                imagen_url = urljoin(url, imagen_url)
-
-        nombre = None
-
-        for tag in bloque.find_all(["h1", "h2", "h3", "h4", "h5", "span", "p", "a"]):
-            txt = tag.get_text(" ", strip=True)
-            if txt and len(txt) > 8 and "$" not in txt:
-                if not re.match(r"^[\d\W]+$", txt):
-                    nombre = txt
-                    break
-
-        if not nombre:
-            nombre = texto.replace(precio_match.group(0), "").strip()
-
-        if not nombre or len(nombre) < 6:
-            continue
-
-        peso = extraer_peso(nombre)
-
-        productos.append({
-            "Producto": nombre,
-            "Peso": peso,
-            "Costo": costo,
-            "Estado": "Actualizado",
-            "Imagen": imagen_url if imagen_url else ""
-        })
-
+    # =========================
+    # 2) LIMPIAR DUPLICADOS
+    # =========================
     vistos = set()
     productos_unicos = []
 
@@ -79,36 +62,47 @@ def obtener_productos_proveedor():
             vistos.add(clave)
             productos_unicos.append(p)
 
-    if not productos_unicos:
-        texto = soup.get_text("\n")
-        lineas = [line.strip() for line in texto.split("\n") if line.strip()]
+    # =========================
+    # 3) INTENTAR MAPEAR IMÁGENES
+    # =========================
+    imagenes_encontradas = []
 
-        i = 0
-        while i < len(lineas) - 1:
-            nombre = lineas[i]
-            precio = lineas[i + 1]
+    for img in soup.find_all("img"):
+        src = (
+            img.get("src")
+            or img.get("data-src")
+            or img.get("data-original")
+            or ""
+        ).strip()
 
-            if re.match(r"^\$\s?\d[\d\.]*$", precio):
-                nombre_limpio = nombre.strip()
-                precio_limpio = precio.replace("$", "").replace(" ", "").replace(".", "")
+        alt = (img.get("alt") or "").strip()
 
-                try:
-                    costo = int(precio_limpio)
-                    peso = extraer_peso(nombre_limpio)
+        if src:
+            imagenes_encontradas.append({
+                "src": urljoin(url, src),
+                "alt": alt.lower()
+            })
 
-                    if len(nombre_limpio) > 5:
-                        productos_unicos.append({
-                            "Producto": nombre_limpio,
-                            "Peso": peso,
-                            "Costo": costo,
-                            "Estado": "Actualizado",
-                            "Imagen": ""
-                        })
-                except:
-                    pass
+    # Intento simple de asociación por nombre
+    for producto in productos_unicos:
+        nombre_base = producto["Producto"].lower()
 
-                i += 2
-            else:
-                i += 1
+        mejor_imagen = ""
+
+        for img in imagenes_encontradas:
+            alt = img["alt"]
+
+            if not alt:
+                continue
+
+            # Buscar coincidencia parcial razonable
+            palabras_producto = [p for p in nombre_base.split() if len(p) > 3]
+            coincidencias = sum(1 for palabra in palabras_producto if palabra in alt)
+
+            if coincidencias >= 2:
+                mejor_imagen = img["src"]
+                break
+
+        producto["Imagen"] = mejor_imagen
 
     return productos_unicos
