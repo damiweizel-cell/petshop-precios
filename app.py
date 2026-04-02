@@ -52,6 +52,9 @@ if "seleccionados" not in st.session_state:
 if "ver_carrito" not in st.session_state:
     st.session_state["ver_carrito"] = False
 
+if "mostrar_reglas" not in st.session_state:
+    st.session_state["mostrar_reglas"] = False
+
 # =========================
 # LOGIN
 # =========================
@@ -108,7 +111,7 @@ if st.session_state["ultima_actualizacion"]:
 # =========================
 # BUSCADOR + ACCIONES
 # =========================
-col1, col2, col3 = st.columns([2,1,1])
+col1, col2, col3, col4 = st.columns([2.5, 1, 1, 1])
 
 with col1:
     busqueda = st.text_input("Buscar producto")
@@ -120,9 +123,32 @@ with col2:
         st.rerun()
 
 with col3:
+    if st.button("Reglas"):
+        st.session_state["mostrar_reglas"] = not st.session_state["mostrar_reglas"]
+
+with col4:
     if st.button(f"Carrito ({len(st.session_state['seleccionados'])})"):
         st.session_state["ver_carrito"] = True
         st.rerun()
+
+# =========================
+# SECCIÓN REGLAS
+# =========================
+if st.session_state["mostrar_reglas"]:
+    st.subheader("⚙️ Reglas de cálculo de venta")
+
+    reglas_editadas = st.data_editor(
+        st.session_state["reglas"],
+        num_rows="dynamic",
+        use_container_width=True
+    )
+
+    if st.button("Guardar reglas"):
+        st.session_state["reglas"] = reglas_editadas.copy()
+        st.success("Reglas guardadas correctamente")
+        st.rerun()
+
+    st.markdown("---")
 
 # =========================
 # FILTRO
@@ -139,7 +165,7 @@ if st.session_state["ver_carrito"]:
     total = 0
 
     for item in st.session_state["seleccionados"]:
-        st.write(item["Producto"], "-", formato_pesos(item["Venta"]))
+        st.write(f"**{item['Producto']}** - {formato_pesos(item['Venta'])}")
         total += item["Venta"]
 
     st.success(f"TOTAL: {formato_pesos(total)}")
@@ -157,10 +183,12 @@ st.header("📦 Productos")
 
 for i, row in df.iterrows():
 
-    col1, col2, col3, col4 = st.columns([4,1,1,1])
+    st.markdown("---")
+
+    col1, col2, col3, col4, col5 = st.columns([5, 1, 1.3, 1.3, 1.5])
 
     with col1:
-        st.write(row["Producto"])
+        st.write(f"**{row['Producto']}**")
 
     with col2:
         st.write(f"{row['Peso']} kg")
@@ -169,7 +197,10 @@ for i, row in df.iterrows():
         st.write(formato_pesos(row["Costo"]))
 
     with col4:
-        st.write(formato_pesos(row["Venta"]))
+        st.write(formato_pesos(row["Ganancia"]))
+
+    with col5:
+        st.markdown(f"**{formato_pesos(row['Venta'])}**")
 
     if st.button("Agregar", key=i):
         st.session_state["seleccionados"].append({
