@@ -442,7 +442,16 @@ st.header("📦 Productos")
 for i, row in df.iterrows():
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
-    col1, col2, col3, col4, col5 = st.columns([5, 1, 1.3, 1.3, 1.8])
+    col_img, col1, col2, col3, col4, col5 = st.columns([1.2, 4, 1, 1.3, 1.3, 1.8])
+
+    with col_img:
+        if row.get("Imagen"):
+            try:
+                st.image(row["Imagen"], width=90)
+            except:
+                st.image("https://placehold.co/90x90?text=Pet", width=90)
+        else:
+            st.image("https://placehold.co/90x90?text=Pet", width=90)
 
     with col1:
         st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
