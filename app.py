@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import pytz
+import urllib.parse
 
 from pricing_engine import (
     formato_pesos,
@@ -47,6 +48,14 @@ st.markdown("""
             font-size: 20px;
             font-weight: 800;
             color: #111827;
+        }
+
+        .carrito-item {
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -105,6 +114,46 @@ def pantalla_login():
 if not st.session_state["logueado"]:
     pantalla_login()
     st.stop()
+
+# =========================
+# FUNCIONES CARRITO
+# =========================
+def agregar_al_carrito(producto, venta):
+    for item in st.session_state["seleccionados"]:
+        if item["Producto"] == producto:
+            item["Cantidad"] += 1
+            return
+
+    st.session_state["seleccionados"].append({
+        "Producto": producto,
+        "Venta": int(venta),
+        "Cantidad": 1
+    })
+
+
+def quitar_del_carrito(producto):
+    st.session_state["seleccionados"] = [
+        x for x in st.session_state["seleccionados"] if x["Producto"] != producto
+    ]
+
+
+def generar_mensaje_whatsapp(items):
+    if not items:
+        return ""
+
+    total = 0
+
+    for item in items:
+        subtotal = item["Cantidad"] * item["Venta"]
+        total += subtotal
+        lineas.append(
+            f"- {item['Cantidad']} x {item['Producto']} = {formato_pesos(subtotal)}"
+        )
+
+    lineas.append("")
+    lineas.append(f"TOTAL DEL PEDIDO: {formato_pesos(total)}")
+
+    return "\n".join(lineas)
 
 # =========================
 # CARGA DE PRODUCTOS
@@ -185,7 +234,13 @@ if st.session_state["mostrar_reglas"]:
 # FILTRO
 # =========================
 if busqueda:
-    df = df[df["Producto"].str.contains(busqueda, case=False)]
+    df = df[df["Producto"].str.contains(busqueda, case=False, na=False)]
+
+df = df.sort_values("Producto")
+
+# 🔥 MOSTRAR SOLO 20 SI NO HAY BÚSQUEDA
+if not busqueda:
+    df = df.head(20)
 
 # =========================
 # CARRITO
@@ -193,17 +248,68 @@ if busqueda:
 if st.session_state["ver_carrito"]:
     st.header("🛒 Carrito")
 
-    total = 0
+    if not st.session_state["seleccionados"]:
+        st.info("El carrito está vacío.")
 
-    for item in st.session_state["seleccionados"]:
-        st.write(f"**{item['Producto']}** - {formato_pesos(item['Venta'])}")
-        total += item["Venta"]
+    else:
+        total_general = 0
 
-    st.success(f"TOTAL: {formato_pesos(total)}")
+        for idx, item in enumerate(st.session_state["seleccionados"]):
+            st.markdown("<div class='carrito-item'>", unsafe_allow_html=True)
 
-    if st.button("Volver"):
-        st.session_state["ver_carrito"] = False
-        st.rerun()
+            subtotal = item["Cantidad"] * item["Venta"]
+            total_general += subtotal
+
+            col1, col2, col3, col4 = st.columns([5, 1.2, 1.5, 1])
+
+            with col1:
+                st.write(f"**{item['Producto']}**")
+                st.caption(f"Precio unitario: {formato_pesos(item['Venta'])}")
+                st.write(f"Subtotal: **{formato_pesos(subtotal)}**")
+
+            with col2:
+                nueva_cantidad = st.number_input(
+                    "Cant.",
+                    min_value=1,
+                    step=1,
+                    value=item["Cantidad"],
+                    key=f"cant_{idx}"
+                )
+                item["Cantidad"] = nueva_cantidad
+
+            with col3:
+                st.write("")
+                st.write("")
+                st.write(f"**{formato_pesos(subtotal)}**")
+
+            with col4:
+                st.write("")
+                st.write("")
+                if st.button("❌", key=f"del_{idx}"):
+                    quitar_del_carrito(item["Producto"])
+                    st.rerun()
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        st.success(f"TOTAL DEL PEDIDO: {formato_pesos(total_general)}")
+
+        mensaje = generar_mensaje_whatsapp(st.session_state["seleccionados"])
+        mensaje_codificado = urllib.parse.quote(mensaje)
+        whatsapp_url = f"https://wa.me/?text={mensaje_codificado}"
+
+        st.link_button("📲 Enviar mensaje por WhatsApp", whatsapp_url, use_container_width=True)
+
+    colv1, colv2 = st.columns(2)
+
+    with colv1:
+        if st.button("⬅️ Volver al catálogo", use_container_width=True):
+            st.session_state["ver_carrito"] = False
+            st.rerun()
+
+    with colv2:
+        if st.button("🗑 Vaciar carrito", use_container_width=True):
+            st.session_state["seleccionados"] = []
+            st.rerun()
 
     st.stop()
 
@@ -225,17 +331,23 @@ for i, row in df.iterrows():
         st.write(f"{row['Peso']} kg")
 
     with col3:
-        st.markdown(f"<div class='dato-secundario'>Costo<br><strong>{formato_pesos(row['Costo'])}</strong></div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='dato-secundario'>Costo<br><strong>{formato_pesos(row['Costo'])}</strong></div>",
+            unsafe_allow_html=True
+        )
 
     with col4:
-        st.markdown(f"<div class='dato-secundario'>Ganancia<br><strong>{formato_pesos(row['Ganancia'])}</strong></div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='dato-secundario'>Ganancia<br><strong>{formato_pesos(row['Ganancia'])}</strong></div>",
+            unsafe_allow_html=True
+        )
 
     with col5:
-        st.markdown(f"<div class='venta-destacada'>{formato_pesos(row['Venta'])}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='venta-destacada'>{formato_pesos(row['Venta'])}</div>",
+            unsafe_allow_html=True
+        )
 
     if st.button("Agregar", key=i):
-        st.session_state["seleccionados"].append({
-            "Producto": row["Producto"],
-            "Venta": row["Venta"]
-        })
+        agregar_al_carrito(row["Producto"], row["Venta"])
         st.toast("Agregado al carrito")
