@@ -3,6 +3,25 @@ import pandas as pd
 from datetime import datetime
 import pytz
 import urllib.parse
+import base64
+
+# =========================
+# ICONO / FAVICON / PWA
+# =========================
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+icono_base64 = get_base64_image("assets/icono_app.png")
+
+st.markdown(f"""
+    <link rel="icon" type="image/png" href="data:image/png;base64,{icono_base64}">
+    <link rel="apple-touch-icon" href="data:image/png;base64,{icono_base64}">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Valentín Pet Food">
+""", unsafe_allow_html=True)
 
 from pricing_engine import (
     formato_pesos,
