@@ -3,25 +3,6 @@ import pandas as pd
 from datetime import datetime
 import pytz
 import urllib.parse
-import base64
-
-# =========================
-# ICONO / FAVICON / PWA
-# =========================
-def get_base64_image(image_path):
-    with open(image_path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode()
-
-icono_base64 = get_base64_image("assets/icono_app.png")
-
-st.markdown(f"""
-    <link rel="icon" type="image/png" href="data:image/png;base64,{icono_base64}">
-    <link rel="apple-touch-icon" href="data:image/png;base64,{icono_base64}">
-    <meta name="theme-color" content="#0F172A">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Valentín Pet Food">
-""", unsafe_allow_html=True)
 
 from pricing_engine import (
     formato_pesos,
@@ -35,8 +16,8 @@ from proveedor_loader import obtener_productos_proveedor
 # CONFIG
 # =========================
 st.set_page_config(
-    page_title="Valentín Pet Food",
-    page_icon="assets/logo.png",
+    page_title="Valentín Pet Food - Tienda Online",
+    page_icon="🐾",
     layout="wide"
 )
 
@@ -161,18 +142,18 @@ st.markdown("""
         box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
     }
 
-    /* CARDS PEQUEÑAS */
+    /* BLOQUES INFO */
     .mini-card {
         background: linear-gradient(180deg, rgba(30,41,59,0.96) 0%, rgba(15,23,42,0.98) 100%);
         border: 1px solid rgba(147,197,253,0.12);
         border-radius: 22px;
         padding: 18px 18px;
         box-shadow: 0 12px 28px rgba(0,0,0,0.24);
-        min-height: 110px;
+        min-height: 125px;
     }
 
     .mini-card-title {
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 900;
         color: #F8FAFC;
         margin-bottom: 6px;
@@ -307,9 +288,9 @@ st.markdown("""
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%) !important;
-        color: #111827 !important;
-        box-shadow: 0 12px 24px rgba(245,158,11,0.28) !important;
+        background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%) !important;
+        color: white !important;
+        box-shadow: 0 12px 24px rgba(34,197,94,0.28) !important;
         text-decoration: none !important;
     }
 
@@ -427,15 +408,37 @@ for p in st.session_state["productos"]:
 df = pd.DataFrame(st.session_state["productos"])
 
 # =========================
+# PRODUCTOS DESTACADOS
+# =========================
+PRIORIDADES = [
+    "biopet",
+    "old prince",
+    "maintenance",
+    "excellent urinary gato",
+    "royal canin"
+]
+
+def es_destacado(nombre):
+    nombre = str(nombre).lower()
+    return any(p in nombre for p in PRIORIDADES)
+
+df_destacados = df[df["Producto"].apply(es_destacado)].copy()
+
+if df_destacados.empty:
+    df_destacados = df.copy()
+
+df_destacados = df_destacados.sort_values("Producto").head(20)
+
+# =========================
 # HEADER SUPERIOR
 # =========================
 st.markdown('<div class="top-header">', unsafe_allow_html=True)
 
-col1, col2 = st.columns([1.1, 4.5])
+col1, col2 = st.columns([1.2, 4.5])
 
 with col1:
     try:
-        st.image("assets/logo.png", width=120)
+        st.image("assets/logo.png", width=150)
     except:
         st.write("🐾")
 
@@ -456,12 +459,12 @@ with hero1:
     st.markdown('<div class="hero-mini">🐾 Tienda online • Pedidos simples • Atención rápida</div>', unsafe_allow_html=True)
     st.markdown('<div class="hero-title">Todo para perros y gatos</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="hero-text">Alimentos, accesorios, higiene y más, con atención rápida y pedidos simples por WhatsApp.</div>',
+        '<div class="hero-text">Encontrá alimentos y productos seleccionados para tu mascota, con pedidos simples y atención directa por WhatsApp.</div>',
         unsafe_allow_html=True
     )
 
     st.link_button(
-        "🚚 Consultar entrega",
+        "💬 Consulta",
         f"https://wa.me/5491141645510?text={mensaje_whatsapp_consulta()}",
         use_container_width=False
     )
@@ -469,7 +472,7 @@ with hero1:
 with hero2:
     st.markdown('<div class="hero-img-box">', unsafe_allow_html=True)
     st.image(
-        "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=80",
         use_container_width=True
     )
     st.markdown('</div>', unsafe_allow_html=True)
@@ -485,31 +488,31 @@ st.markdown(
 )
 
 # =========================
-# MINI CARDS
+# BLOQUES INFO (NO PARECEN BOTONES)
 # =========================
 mc1, mc2, mc3 = st.columns(3)
 
 with mc1:
     st.markdown("""
         <div class="mini-card">
-            <div class="mini-card-title">🐾 Productos</div>
-            <div class="mini-card-text">Encontrá alimentos y artículos para perros y gatos.</div>
+            <div class="mini-card-title">🐾 Productos seleccionados</div>
+            <div class="mini-card-text">Mostramos alimentos y artículos destacados para perros y gatos.</div>
         </div>
     """, unsafe_allow_html=True)
 
 with mc2:
     st.markdown("""
         <div class="mini-card">
-            <div class="mini-card-title">🚚 Entrega</div>
-            <div class="mini-card-text">Consultanos disponibilidad y tiempos de entrega.</div>
+            <div class="mini-card-title">📦 Compra simple</div>
+            <div class="mini-card-text">Elegí productos, sumalos al carrito y armá tu pedido fácil.</div>
         </div>
     """, unsafe_allow_html=True)
 
 with mc3:
     st.markdown("""
         <div class="mini-card">
-            <div class="mini-card-title">💬 WhatsApp</div>
-            <div class="mini-card-text">Armá tu carrito y enviá tu pedido en segundos.</div>
+            <div class="mini-card-title">💬 Atención por WhatsApp</div>
+            <div class="mini-card-text">Consultas y pedidos directos desde la tienda online.</div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -557,12 +560,10 @@ with col3:
 # FILTRO
 # =========================
 if busqueda:
-    df = df[df["Producto"].str.contains(busqueda, case=False, na=False)]
-
-df = df.sort_values("Producto")
-
-if not busqueda:
-    df = df.head(20)
+    df_mostrar = df[df["Producto"].str.contains(busqueda, case=False, na=False)].copy()
+    df_mostrar = df_mostrar.sort_values("Producto")
+else:
+    df_mostrar = df_destacados.copy()
 
 # =========================
 # CARRITO
@@ -641,7 +642,7 @@ if st.session_state["ver_carrito"]:
 # =========================
 st.markdown('<div class="titulo-seccion">🐶🐱 Productos destacados</div>', unsafe_allow_html=True)
 
-for i, row in df.iterrows():
+for i, row in df_mostrar.iterrows():
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
     col_img, col1, col2, col3 = st.columns([1.2, 4.3, 1.8, 1.6])
