@@ -207,14 +207,16 @@ st.markdown("""
             font-size: 17px !important;
         }
 
-        div[data-testid="stNumberInput"] input,
-        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+        div[data-testid="stNumberInput"] input {
             border-radius: 16px !important;
             min-height: 50px !important;
             font-size: 16px !important;
+            background: #F8FAFC !important;
+            color: #111827 !important;
+            border: none !important;
         }
 
-        /* ===== Botones ===== */
+        /* ===== BOTONES - CORREGIDOS ===== */
         div.stButton > button {
             border-radius: 18px !important;
             font-weight: 900 !important;
@@ -222,6 +224,20 @@ st.markdown("""
             border: none !important;
             min-height: 52px !important;
             font-size: 16px !important;
+            background: linear-gradient(135deg, #F8FAFC 0%, #E5E7EB 100%) !important;
+            color: #111827 !important;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.16) !important;
+        }
+
+        div.stButton > button:hover {
+            background: linear-gradient(135deg, #FFFFFF 0%, #D1D5DB 100%) !important;
+            color: #111827 !important;
+        }
+
+        div.stButton > button p,
+        div.stButton > button span,
+        div.stButton > button div {
+            color: #111827 !important;
         }
 
         div[data-testid="stLinkButton"] a {
@@ -421,16 +437,23 @@ with col3:
     cantidad_total = total_items_carrito()
 
     if cantidad_total > 0:
-        st.markdown("""
-            <style>
-                div[data-testid="column"]:nth-of-type(3) div.stButton > button {
-                    background: linear-gradient(135deg, #86EFAC 0%, #22C55E 100%) !important;
-                    color: #052E16 !important;
-                    border: none !important;
-                    box-shadow: 0 10px 22px rgba(34,197,94,0.28) !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+            div[data-testid="column"]:nth-of-type(3) div.stButton > button {
+                background: linear-gradient(135deg, #86EFAC 0%, #22C55E 100%) !important;
+                color: #052E16 !important;
+                border: none !important;
+                box-shadow: 0 10px 22px rgba(34,197,94,0.28) !important;
+            }
+
+            div[data-testid="column"]:nth-of-type(3) div.stButton > button p,
+            div[data-testid="column"]:nth-of-type(3) div.stButton > button span,
+            div[data-testid="column"]:nth-of-type(3) div.stButton > button div {
+                color: #052E16 !important;
+                font-weight: 900 !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
     if st.button(f"Carrito ({cantidad_total})", use_container_width=True):
         st.session_state["cliente_ver_carrito"] = True
@@ -553,16 +576,18 @@ for i, row in df.iterrows():
         )
 
     with col3:
-        cantidad = st.selectbox(
-            "Cant.",
-            options=[1, 2, 3, 4, 5, 6],
-            index=0,
-            key=f"cantidad_producto_{i}"
-        )
+    cantidad = st.number_input(
+        "Cant.",
+        min_value=1,
+        max_value=99,
+        step=1,
+        value=1,
+        key=f"cantidad_producto_{i}"
+    )
 
-        if st.button("Agregar", key=f"agregar_cliente_{i}", use_container_width=True):
-            agregar_al_carrito(row["Producto"], row["Venta"], cantidad)
-            st.toast("✅ Producto agregado")
-            st.rerun()
+    if st.button("Agregar", key=f"agregar_cliente_{i}", use_container_width=True):
+        agregar_al_carrito(row["Producto"], row["Venta"], cantidad)
+        st.toast("✅ Producto agregado")
+        st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
