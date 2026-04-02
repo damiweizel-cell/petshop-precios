@@ -26,28 +26,84 @@ st.set_page_config(
 # =========================
 st.markdown("""
     <style>
+        .stApp {
+            background: linear-gradient(180deg, #F0F9FF 0%, #F8FAFC 35%, #F3F4F6 100%);
+        }
+
+        .main .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            max-width: 1320px;
+        }
+
+        .header-card {
+            background: linear-gradient(135deg, #E0F2FE 0%, #F8FAFC 100%);
+            border-radius: 28px;
+            padding: 28px 32px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+            border: 1px solid #DBEAFE;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-card::before {
+            content: "🐾 🐾 🐾";
+            position: absolute;
+            right: 28px;
+            top: 18px;
+            font-size: 34px;
+            opacity: 0.10;
+        }
+
+        .section-title {
+            font-size: 46px;
+            font-weight: 900;
+            color: #0F172A;
+            margin-bottom: 6px;
+            line-height: 1.1;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: #475569;
+            font-weight: 500;
+        }
+
         .venta-destacada {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 900;
             color: #15803D;
             background-color: #DCFCE7;
-            padding: 10px 14px;
-            border-radius: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
             text-align: center;
             display: inline-block;
-            min-width: 130px;
+            min-width: 140px;
+            box-shadow: 0 4px 12px rgba(34,197,94,0.18);
         }
 
         .dato-secundario {
             font-size: 15px;
             color: #6B7280;
             font-weight: 600;
+            text-align: center;
         }
 
         .producto-nombre {
             font-size: 20px;
             font-weight: 800;
             color: #111827;
+            line-height: 1.3;
+        }
+
+        .producto-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
         }
 
         .carrito-item {
@@ -56,6 +112,51 @@ st.markdown("""
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 14px;
+        }
+
+        div.stButton > button {
+            border-radius: 14px;
+            font-weight: 700;
+            padding: 0.65rem 1rem;
+            border: none;
+        }
+
+        div.stTextInput > div > div > input {
+            border-radius: 16px;
+            background: white;
+            color: #111827 !important;
+            border: 1px solid #D1D5DB;
+        }
+
+        .bloque-reglas {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #E5E7EB;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        }
+
+        .carrito-total {
+            background: #ECFDF5;
+            border: 2px solid #22C55E;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .carrito-total-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #166534;
+        }
+
+        .carrito-total-value {
+            font-size: 38px;
+            font-weight: 900;
+            color: #14532D;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -183,11 +284,24 @@ df = pd.DataFrame(productos)
 # =========================
 # HEADER
 # =========================
-st.title("🐾 Valentín Pet Food")
-st.caption("Sistema de precios automático")
+st.markdown('<div class="header-card">', unsafe_allow_html=True)
+
+col_logo, col_titulo = st.columns([1, 5])
+
+with col_logo:
+    try:
+        st.image("assets/logo.png", width=150)
+    except:
+        st.write("🐾")
+
+with col_titulo:
+    st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Sistema de precios automático</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 if st.session_state["ultima_actualizacion"]:
-    st.info(f"Última actualización: {st.session_state['ultima_actualizacion']}")
+    st.info(f"🕒 Última actualización: {st.session_state['ultima_actualizacion']}")
 
 # =========================
 # BUSCADOR + ACCIONES
@@ -216,6 +330,7 @@ with col4:
 # SECCIÓN REGLAS
 # =========================
 if st.session_state["mostrar_reglas"]:
+    st.markdown('<div class="bloque-reglas">', unsafe_allow_html=True)
     st.subheader("⚙️ Reglas de cálculo de venta")
 
     reglas_editadas = st.data_editor(
@@ -229,7 +344,7 @@ if st.session_state["mostrar_reglas"]:
         st.success("Reglas guardadas correctamente")
         st.rerun()
 
-    st.markdown("---")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
 # FILTRO
@@ -239,7 +354,7 @@ if busqueda:
 
 df = df.sort_values("Producto")
 
-# 🔥 MOSTRAR SOLO 20 SI NO HAY BÚSQUEDA
+# Mostrar solo 20 si no hay búsqueda
 if not busqueda:
     df = df.head(20)
 
@@ -256,10 +371,10 @@ if st.session_state["ver_carrito"]:
         total_general = 0
 
         for idx, item in enumerate(st.session_state["seleccionados"]):
-            st.markdown("<div class='carrito-item'>", unsafe_allow_html=True)
-
             subtotal = item["Cantidad"] * item["Venta"]
             total_general += subtotal
+
+            st.markdown('<div class="carrito-item">', unsafe_allow_html=True)
 
             col1, col2, col3, col4 = st.columns([5, 1.2, 1.5, 1])
 
@@ -290,9 +405,14 @@ if st.session_state["ver_carrito"]:
                     quitar_del_carrito(item["Producto"])
                     st.rerun()
 
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        st.success(f"TOTAL DEL PEDIDO: {formato_pesos(total_general)}")
+        st.markdown(f"""
+            <div class="carrito-total">
+                <div class="carrito-total-label">TOTAL DEL PEDIDO</div>
+                <div class="carrito-total-value">{formato_pesos(total_general)}</div>
+            </div>
+        """, unsafe_allow_html=True)
 
         mensaje = generar_mensaje_whatsapp(st.session_state["seleccionados"])
         mensaje_codificado = urllib.parse.quote(mensaje)
@@ -320,8 +440,7 @@ if st.session_state["ver_carrito"]:
 st.header("📦 Productos")
 
 for i, row in df.iterrows():
-
-    st.markdown("---")
+    st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
     col1, col2, col3, col4, col5 = st.columns([5, 1, 1.3, 1.3, 1.8])
 
@@ -349,6 +468,10 @@ for i, row in df.iterrows():
             unsafe_allow_html=True
         )
 
+    st.markdown("<br>", unsafe_allow_html=True)
+
     if st.button("Agregar", key=i):
         agregar_al_carrito(row["Producto"], row["Venta"])
         st.toast("Agregado al carrito")
+
+    st.markdown('</div>', unsafe_allow_html=True)
