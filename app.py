@@ -141,6 +141,7 @@ def generar_mensaje_whatsapp(items):
     if not items:
         return ""
 
+    lineas = []
     total = 0
 
     for item in items:
