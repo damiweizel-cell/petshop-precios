@@ -21,6 +21,37 @@ st.set_page_config(
 )
 
 # =========================
+# ESTILOS VISUALES
+# =========================
+st.markdown("""
+    <style>
+        .venta-destacada {
+            font-size: 28px;
+            font-weight: 900;
+            color: #15803D;
+            background-color: #DCFCE7;
+            padding: 10px 14px;
+            border-radius: 14px;
+            text-align: center;
+            display: inline-block;
+            min-width: 130px;
+        }
+
+        .dato-secundario {
+            font-size: 15px;
+            color: #6B7280;
+            font-weight: 600;
+        }
+
+        .producto-nombre {
+            font-size: 20px;
+            font-weight: 800;
+            color: #111827;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# =========================
 # ZONA HORARIA
 # =========================
 zona = pytz.timezone("America/Argentina/Buenos_Aires")
@@ -185,22 +216,22 @@ for i, row in df.iterrows():
 
     st.markdown("---")
 
-    col1, col2, col3, col4, col5 = st.columns([5, 1, 1.3, 1.3, 1.5])
+    col1, col2, col3, col4, col5 = st.columns([5, 1, 1.3, 1.3, 1.8])
 
     with col1:
-        st.write(f"**{row['Producto']}**")
+        st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
 
     with col2:
         st.write(f"{row['Peso']} kg")
 
     with col3:
-        st.write(formato_pesos(row["Costo"]))
+        st.markdown(f"<div class='dato-secundario'>Costo<br><strong>{formato_pesos(row['Costo'])}</strong></div>", unsafe_allow_html=True)
 
     with col4:
-        st.write(formato_pesos(row["Ganancia"]))
+        st.markdown(f"<div class='dato-secundario'>Ganancia<br><strong>{formato_pesos(row['Ganancia'])}</strong></div>", unsafe_allow_html=True)
 
     with col5:
-        st.markdown(f"**{formato_pesos(row['Venta'])}**")
+        st.markdown(f"<div class='venta-destacada'>{formato_pesos(row['Venta'])}</div>", unsafe_allow_html=True)
 
     if st.button("Agregar", key=i):
         st.session_state["seleccionados"].append({
