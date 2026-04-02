@@ -16,8 +16,8 @@ from proveedor_loader import obtener_productos_proveedor
 # CONFIG
 # =========================
 st.set_page_config(
-    page_title="Valentín Pet Food - Tienda Online",
-    page_icon="🐾",
+    page_title="Valentín Pet Food",
+    page_icon="assets/logo.png",
     layout="wide"
 )
 
