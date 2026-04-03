@@ -278,7 +278,7 @@ with h1:
     st.markdown('<div class="hero-text">Comprá fácil y rápido por WhatsApp</div>', unsafe_allow_html=True)
 
     st.link_button(
-        "Consultar",
+        "Consultas por Whatsapp",
         f"https://wa.me/5491141645510?text={mensaje_whatsapp_consulta()}"
     )
 
