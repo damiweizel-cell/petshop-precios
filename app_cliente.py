@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # =========================
-# ESTILOS
+# ESTILOS MOBILE-FIRST
 # =========================
 st.markdown("""
 <style>
@@ -32,9 +32,11 @@ st.markdown("""
     }
 
     .main .block-container {
-        max-width: 1250px;
-        padding-top: 0.4rem;
+        max-width: 1100px;
+        padding-top: 0.3rem;
         padding-bottom: 1.2rem;
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
     }
 
     h1, h2, h3, h4, h5, h6, p, span, label, div {
@@ -51,40 +53,44 @@ st.markdown("""
        HEADER
     ========================= */
     .header-clean {
-        padding: 0 0 10px 0;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-        margin-bottom: 12px;
-    }
-
-    .titulo {
-        font-size: 35px;
-        font-weight: 900;
-        margin-top: -12px;
-        margin-bottom: 2px;
-        line-height: 1.05;
-    }
-
-    .subtitulo {
-        font-size: 19px;
-        color: #CBD5E1;
-        margin-top: 0;
+        padding: 0 0 8px 0;
+        margin-bottom: 10px;
     }
 
     .logo-wrap {
-        margin-bottom: -28px;
+        display: flex;
+        justify-content: center;
+        margin-bottom: -32px;
+        margin-top: -4px;
+    }
+
+    .titulo {
+        font-size: 24px;
+        font-weight: 900;
+        line-height: 1.05;
+        margin-top: -12px;
+        margin-bottom: 4px;
+        text-align: left;
+    }
+
+    .subtitulo {
+        font-size: 14px;
+        color: #CBD5E1;
+        margin-top: 0;
+        text-align: left;
     }
 
     /* =========================
        BUSCADOR
     ========================= */
     .busqueda-label {
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 900;
         margin-bottom: 6px;
     }
 
     .busqueda-ayuda {
-        font-size: 14px;
+        font-size: 12px;
         color: #CBD5E1;
         font-style: italic;
         font-weight: 500;
@@ -92,23 +98,27 @@ st.markdown("""
     }
 
     div.stTextInput > div > div > input {
-        font-size: 17px !important;
+        font-size: 15px !important;
         font-weight: 700 !important;
         background: #F8FAFC !important;
         color: #111827 !important;
         border-radius: 12px !important;
-        min-height: 48px !important;
-        padding-right: 42px !important;
+        min-height: 42px !important;
+        padding-right: 12px !important;
     }
 
+    /* =========================
+       BOTONES
+    ========================= */
     div.stButton > button {
         border-radius: 12px !important;
         font-weight: 900 !important;
-        min-height: 48px !important;
+        min-height: 42px !important;
         background: #E5E7EB !important;
         color: #111827 !important;
-        font-size: 15px !important;
-        padding: 0.3rem 0.7rem !important;
+        font-size: 13px !important;
+        padding: 0.15rem 0.5rem !important;
+        border: none !important;
     }
 
     div.stButton > button p,
@@ -117,200 +127,210 @@ st.markdown("""
         color: #111827 !important;
     }
 
-    /* =========================
-       INFO
-    ========================= */
-    .info-banner {
-        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-        border-radius: 16px;
-        padding: 14px;
-        margin-bottom: 18px;
-        font-weight: 800;
-    }
-
-    /* =========================
-       HERO
-    ========================= */
-    .hero-title {
-        font-size: 38px;
-        font-weight: 900;
-        line-height: 1.05;
-    }
-
-    .hero-text {
-        font-size: 19px;
-        margin-bottom: 18px;
-    }
-
-    /* =========================
-       BLOQUE INFO
-    ========================= */
-    .info-box-unico {
-        background: rgba(30,41,59,0.6);
-        border-radius: 20px;
-        padding: 18px;
-        margin-bottom: 18px;
-    }
-
-    .info-item-title {
-        font-size: 20px;
-        font-weight: 900;
-    }
-
-    .info-item-text {
-        font-size: 15px;
-        color: #CBD5E1;
-    }
-
-    /* =========================
-       PRODUCTOS
-    ========================= */
-    .producto-card {
-        padding: 6px 0 6px 0;
-    }
-
-    .producto-nombre {
-        font-size: 20px;
-        font-weight: 900;
-        margin-bottom: 8px;
-        line-height: 1.25;
-    }
-
-    .precio-cliente {
-        font-size: 18px;
-        font-weight: 900;
-        background: linear-gradient(135deg, #86EFAC, #22C55E);
-        padding: 10px 14px;
-        border-radius: 14px;
-        text-align: center;
-        display: inline-block;
-        min-width: 150px;
-        color: #052E16 !important;
-        margin-bottom: 8px;
-    }
-
-    div[data-testid="stNumberInput"] input {
-        font-size: 18px !important;
-        font-weight: 900 !important;
-        text-align: center !important;
-        background: #F8FAFC !important;
-        color: #111827 !important;
-        border-radius: 12px !important;
-        min-height: 48px !important;
-    }
-
-    label {
-        margin-bottom: 2px !important;
-    }
-
-    hr {
-        border: none;
-        height: 1px;
-        background: rgba(148,163,184,0.22);
-        margin: 6px 0 8px 0;
-    }
-
     div[data-testid="stLinkButton"] a {
         border-radius: 12px !important;
         font-weight: 900 !important;
-        min-height: 48px !important;
+        min-height: 44px !important;
         background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%) !important;
         color: white !important;
         text-decoration: none !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
+        font-size: 14px !important;
     }
 
     /* =========================
-       MOBILE
+       INFO
     ========================= */
-    @media (max-width: 768px) {
-    .main .block-container {
-        padding-top: 0.2rem;
-        padding-left: 0.8rem;
-        padding-right: 0.8rem;
-        padding-bottom: 1rem;
+    .info-banner {
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-weight: 800;
+        font-size: 14px;
     }
 
-    .logo-wrap {
-        margin-bottom: -48px;
-    }
-
-    .titulo {
-        font-size: 27px;
-        margin-top: -24px;
-    }
-
-    .subtitulo {
-        font-size: 15px;
-    }
-
+    /* =========================
+       HERO
+    ========================= */
     .hero-title {
-        font-size: 26px;
+        font-size: 22px;
+        font-weight: 900;
+        line-height: 1.08;
+        margin-bottom: 8px;
     }
 
     .hero-text {
-        font-size: 16px;
+        font-size: 15px;
+        margin-bottom: 16px;
+        color: #E2E8F0;
     }
 
-    .producto-nombre {
-        font-size: 18px;
-    }
-
-    .precio-cliente {
-        font-size: 17px;
-        min-width: 130px;
-        padding: 9px 12px;
-        margin-top: 4px;
-        margin-bottom: 4px;
+    /* =========================
+       BLOQUE INFO
+    ========================= */
+    .info-box-unico {
+        background: rgba(30,41,59,0.58);
+        border-radius: 18px;
+        padding: 16px;
+        margin-bottom: 18px;
+        border: 1px solid rgba(255,255,255,0.04);
     }
 
     .info-item-title {
         font-size: 17px;
+        font-weight: 900;
+        margin-bottom: 4px;
     }
 
     .info-item-text {
         font-size: 13px;
+        color: #CBD5E1;
+        line-height: 1.35;
     }
 
-    .busqueda-label {
-        font-size: 16px;
-    }
-
-    .busqueda-ayuda {
-        font-size: 12px;
-    }
-
-    div.stButton > button {
-        min-height: 40px !important;
-        font-size: 13px !important;
-        padding: 0.2rem 0.45rem !important;
-    }
-
-    div[data-testid="stNumberInput"] input {
-        min-height: 40px !important;
-        font-size: 15px !important;
-    }
-
-    div.stTextInput > div > div > input {
-        min-height: 40px !important;
-        font-size: 15px !important;
-    }
-
-    hr {
-        margin: 8px 0 10px 0 !important;
+    /* =========================
+       PRODUCTOS
+    ========================= */
+    .titulo-productos {
+        font-size: 18px;
+        font-weight: 900;
+        margin-top: 6px;
+        margin-bottom: 8px;
     }
 
     .producto-card {
-        padding: 6px 0 6px 0 !important;
+        padding: 6px 0 6px 0;
+    }
+
+    .producto-nombre {
+        font-size: 17px;
+        font-weight: 900;
+        margin-bottom: 8px;
+        line-height: 1.25;
+    }
+
+    .precio-cliente {
+        font-size: 16px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #86EFAC, #22C55E);
+        padding: 9px 12px;
+        border-radius: 12px;
+        text-align: center;
+        display: inline-block;
+        min-width: 125px;
+        color: #052E16 !important;
+        margin-bottom: 6px;
+    }
+
+    div[data-testid="stNumberInput"] input {
+        font-size: 15px !important;
+        font-weight: 900 !important;
+        text-align: center !important;
+        background: #F8FAFC !important;
+        color: #111827 !important;
+        border-radius: 12px !important;
+        min-height: 42px !important;
     }
 
     label {
-        margin-bottom: 0px !important;
-        font-size: 13px !important;
+        margin-bottom: 1px !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;
     }
-}
+
+    hr {
+        border: none;
+        height: 1px;
+        background: rgba(148,163,184,0.16);
+        margin: 6px 0 8px 0;
+    }
+
+    /* =========================
+       DESKTOP
+    ========================= */
+    @media (min-width: 769px) {
+        .main .block-container {
+            padding-top: 0.6rem;
+            padding-left: 1.2rem;
+            padding-right: 1.2rem;
+            padding-bottom: 1.8rem;
+        }
+
+        .logo-wrap {
+            justify-content: flex-start;
+            margin-bottom: -24px;
+        }
+
+        .titulo {
+            font-size: 34px;
+            margin-top: -10px;
+        }
+
+        .subtitulo {
+            font-size: 18px;
+        }
+
+        .busqueda-label {
+            font-size: 18px;
+        }
+
+        .busqueda-ayuda {
+            font-size: 13px;
+        }
+
+        div.stTextInput > div > div > input {
+            min-height: 48px !important;
+            font-size: 17px !important;
+        }
+
+        div.stButton > button {
+            min-height: 48px !important;
+            font-size: 15px !important;
+        }
+
+        div[data-testid="stNumberInput"] input {
+            min-height: 48px !important;
+            font-size: 17px !important;
+        }
+
+        .info-banner {
+            font-size: 16px;
+        }
+
+        .hero-title {
+            font-size: 40px;
+        }
+
+        .hero-text {
+            font-size: 19px;
+        }
+
+        .info-item-title {
+            font-size: 21px;
+        }
+
+        .info-item-text {
+            font-size: 15px;
+        }
+
+        .titulo-productos {
+            font-size: 28px;
+            margin-bottom: 14px;
+        }
+
+        .producto-nombre {
+            font-size: 22px;
+        }
+
+        .precio-cliente {
+            font-size: 20px;
+            min-width: 160px;
+            padding: 10px 14px;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -345,6 +365,11 @@ def agregar(producto, precio, cantidad):
         "Precio": precio,
         "Cantidad": cantidad
     })
+
+def quitar(producto):
+    st.session_state["carrito"] = [
+        x for x in st.session_state["carrito"] if x["Producto"] != producto
+    ]
 
 def total_items():
     return sum(x["Cantidad"] for x in st.session_state["carrito"])
@@ -394,11 +419,11 @@ df_destacados = df_destacados.sort_values("Producto")
 # =========================
 st.markdown('<div class="header-clean">', unsafe_allow_html=True)
 
-c1, c2 = st.columns([1.7, 4.3])
+c1, c2 = st.columns([1.45, 3.55], gap="small")
 
 with c1:
     st.markdown('<div class="logo-wrap">', unsafe_allow_html=True)
-    st.image("assets/logo.png", width=300)
+    st.image("assets/logo.png", width=240)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with c2:
@@ -408,32 +433,32 @@ with c2:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
-# BUSCADOR
+# BUSCADOR MOBILE-FIRST
 # =========================
 st.markdown(
     '<div class="busqueda-label">Buscar producto <span class="busqueda-ayuda">escribí el nombre y presioná la lupa</span></div>',
     unsafe_allow_html=True
 )
 
-busq1, busq2 = st.columns([4.8, 1.2], gap="small")
+# En mobile: barra grande + lupa chica + carrito chico
+b1, b2, b3 = st.columns([4.5, 0.9, 1.4], gap="small")
 
-with busq1:
+with b1:
     busqueda = st.text_input(
         "",
-        placeholder="Ej: Old Prince, pipetas, piedras sanitarias...",
+        placeholder="Ej: Old Prince, pipetas...",
         label_visibility="collapsed"
     )
 
-with busq2:
+with b2:
+    if st.button("🔎", use_container_width=True):
+        st.session_state["buscar_click"] = True
+
+with b3:
     if st.button(f"🛒 {total_items()}", use_container_width=True):
         st.session_state["ver_carrito"] = True
         st.rerun()
 
-# lupa integrada debajo del input, pero visualmente pegada al buscador
-buscar = st.button("🔎 Buscar", use_container_width=True)
-if buscar:
-    st.session_state["buscar_click"] = True
-    
 # =========================
 # INFO
 # =========================
@@ -445,7 +470,7 @@ st.markdown(
 # =========================
 # HERO
 # =========================
-h1, h2 = st.columns([1,1.2])
+h1, h2 = st.columns([1, 1.15], gap="medium")
 
 with h1:
     st.markdown('<div class="hero-title">Todo para perros y gatos</div>', unsafe_allow_html=True)
@@ -453,7 +478,8 @@ with h1:
 
     st.link_button(
         "Consultas por WhatsApp",
-        f"https://wa.me/5491141645510?text={mensaje_whatsapp_consulta()}"
+        f"https://wa.me/5491141645510?text={mensaje_whatsapp_consulta()}",
+        use_container_width=True
     )
 
 with h2:
@@ -464,7 +490,7 @@ with h2:
 # =========================
 st.markdown('<div class="info-box-unico">', unsafe_allow_html=True)
 
-i1, i2, i3 = st.columns(3)
+i1, i2, i3 = st.columns(3, gap="small")
 
 with i1:
     st.markdown("<div class='info-item-title'>🐾 Productos seleccionados</div>", unsafe_allow_html=True)
@@ -493,15 +519,86 @@ else:
     titulo_productos = "🐶🐱 Productos destacados"
 
 # =========================
+# CARRITO
+# =========================
+if st.session_state["ver_carrito"]:
+    st.markdown('<div class="titulo-productos">🛒 Mi carrito</div>', unsafe_allow_html=True)
+
+    if not st.session_state["carrito"]:
+        st.info("Todavía no agregaste productos.")
+
+    else:
+        total = 0
+
+        for i, item in enumerate(st.session_state["carrito"]):
+            sub = item["Cantidad"] * item["Precio"]
+            total += sub
+
+            st.markdown('<div class="producto-card">', unsafe_allow_html=True)
+
+            c1, c2 = st.columns([3.5, 1.5], gap="small")
+
+            with c1:
+                st.markdown(f"<div class='producto-nombre'>{item['Producto']}</div>", unsafe_allow_html=True)
+                st.caption(f"Precio unitario: {formato_pesos(item['Precio'])}")
+                st.write(f"Subtotal: **{formato_pesos(sub)}**")
+
+            with c2:
+                cant = st.number_input(
+                    "Cant.",
+                    min_value=1,
+                    value=item["Cantidad"],
+                    key=f"cant{i}"
+                )
+                item["Cantidad"] = cant
+
+                if st.button("❌", key=f"del{i}", use_container_width=True):
+                    quitar(item["Producto"])
+                    st.rerun()
+
+            st.markdown("<hr>", unsafe_allow_html=True)
+
+        st.markdown(f"""
+            <div style="
+                background: linear-gradient(135deg, #14532D 0%, #166534 100%);
+                border-radius: 18px;
+                padding: 18px;
+                text-align: center;
+                margin-top: 14px;
+                margin-bottom: 16px;
+            ">
+                <div style="font-size: 13px; font-weight: 800; color: #DCFCE7;">TOTAL DEL PEDIDO</div>
+                <div style="font-size: 30px; font-weight: 900; color: #F0FDF4;">{formato_pesos(total)}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        url = f"https://wa.me/5491141645510?text={mensaje_whatsapp_pedido()}"
+        st.link_button("📲 Enviar pedido", url, use_container_width=True)
+
+    cv1, cv2 = st.columns(2, gap="small")
+
+    with cv1:
+        if st.button("⬅️ Volver", use_container_width=True):
+            st.session_state["ver_carrito"] = False
+            st.rerun()
+
+    with cv2:
+        if st.button("🗑 Vaciar", use_container_width=True):
+            st.session_state["carrito"] = []
+            st.rerun()
+
+    st.stop()
+
+# =========================
 # PRODUCTOS
 # =========================
-st.markdown(f"## {titulo_productos}")
+st.markdown(f'<div class="titulo-productos">{titulo_productos}</div>', unsafe_allow_html=True)
 
 for i, row in df_mostrar.iterrows():
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
-    # nombre + precio
-    t1, t2 = st.columns([3.2, 1.8])
+    # Nombre + precio
+    t1, t2 = st.columns([3.2, 1.8], gap="small")
 
     with t1:
         st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
@@ -512,26 +609,25 @@ for i, row in df_mostrar.iterrows():
             unsafe_allow_html=True
         )
 
-    # cantidad + botón (más compacto y estable en mobile)
-c1, c2 = st.columns([1.1, 2.9], gap="small")
+    # Cantidad + botón (lo más compacto posible en Streamlit)
+    c1, c2 = st.columns([1.25, 2.75], gap="small")
 
-with c1:
-    cantidad = st.number_input(
-        "Cantidad",
-        min_value=1,
-        max_value=99,
-        value=1,
-        step=1,
-        key=f"prod{i}",
-        label_visibility="visible"
-    )
+    with c1:
+        cantidad = st.number_input(
+            "Cantidad",
+            min_value=1,
+            max_value=99,
+            value=1,
+            step=1,
+            key=f"prod{i}"
+        )
 
-with c2:
-    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
-    if st.button("Agregar al carrito", key=f"btn{i}", use_container_width=True):
-        agregar(row["Producto"], row["Venta"], cantidad)
-        st.toast("✅ Producto agregado")
-        st.rerun()
+    with c2:
+        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+        if st.button("Agregar al carrito", key=f"btn{i}", use_container_width=True):
+            agregar(row["Producto"], row["Venta"], cantidad)
+            st.toast("✅ Producto agregado")
+            st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
