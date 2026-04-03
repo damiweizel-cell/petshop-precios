@@ -492,7 +492,8 @@ if st.session_state["ver_carrito"]:
         display:inline-block;
         text-align:center;
         font-size:14px;
-    ">
+    " onmouseover="this.style.backgroundColor='#1DA851'" 
+      onmouseout="this.style.backgroundColor='#25D366'">
         Enviar
     </a>
     """,
