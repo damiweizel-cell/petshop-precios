@@ -26,137 +26,223 @@ st.set_page_config(
 # =========================
 st.markdown("""
     <style>
+        /* =========================
+           FONDO GENERAL
+        ========================= */
         .stApp {
-            background: linear-gradient(180deg, #F0F9FF 0%, #F8FAFC 35%, #F3F4F6 100%);
+            background: linear-gradient(180deg, #0F172A 0%, #132238 35%, #1E293B 100%);
         }
 
         .main .block-container {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
             max-width: 1320px;
         }
 
+        /* =========================
+           HEADER
+        ========================= */
         .header-card {
-            background: linear-gradient(135deg, #E0F2FE 0%, #F8FAFC 100%);
-            border-radius: 28px;
-            padding: 28px 32px;
-            box-shadow: 0 10px 28px rgba(0,0,0,0.06);
-            margin-bottom: 24px;
-            border: 1px solid #DBEAFE;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header-card::before {
-            content: "🐾 🐾 🐾";
-            position: absolute;
-            right: 28px;
-            top: 18px;
-            font-size: 34px;
-            opacity: 0.10;
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 18px;
+            border: none;
+            box-shadow: none;
         }
 
         .section-title {
-            font-size: 46px;
-            font-weight: 900;
-            color: #0F172A;
-            margin-bottom: 6px;
-            line-height: 1.1;
+            font-size: 30px;
+            font-weight: 800;
+            color: #F8FAFC;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            line-height: 1.15;
+            text-align: center;
         }
 
         .section-subtitle {
-            font-size: 18px;
-            color: #475569;
-            font-weight: 500;
-        }
-
-        .venta-destacada {
-            font-size: 30px;
-            font-weight: 900;
-            color: #15803D;
-            background-color: #DCFCE7;
-            padding: 12px 16px;
-            border-radius: 16px;
-            text-align: center;
-            display: inline-block;
-            min-width: 140px;
-            box-shadow: 0 4px 12px rgba(34,197,94,0.18);
-        }
-
-        .dato-secundario {
             font-size: 15px;
-            color: #6B7280;
-            font-weight: 600;
+            color: #CBD5E1;
+            font-weight: 500;
             text-align: center;
+            margin-bottom: 8px;
         }
 
-        .producto-nombre {
-            font-size: 20px;
-            font-weight: 800;
-            color: #111827;
-            line-height: 1.3;
+        /* =========================
+           INFO Y TEXTOS
+        ========================= */
+        .stAlert {
+            border-radius: 14px !important;
         }
 
-        .producto-card {
-            background: white;
-            border-radius: 20px;
-            padding: 18px 20px;
-            margin-bottom: 16px;
-            border: 1px solid #E5E7EB;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        .stInfo {
+            background-color: rgba(191, 219, 254, 0.18) !important;
+            color: #E0F2FE !important;
+            border: 1px solid rgba(147, 197, 253, 0.25) !important;
         }
 
-        .carrito-item {
-            background: #F9FAFB;
-            border: 1px solid #E5E7EB;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 14px;
+        h1, h2, h3, h4, h5, h6, label, p, span, div {
+            color: #F8FAFC;
         }
 
+        /* =========================
+           INPUTS / BOTONES
+        ========================= */
         div.stButton > button {
-            border-radius: 14px;
+            border-radius: 12px;
             font-weight: 700;
-            padding: 0.65rem 1rem;
+            padding: 0.55rem 0.9rem;
             border: none;
+            background-color: #F8FAFC;
+            color: #0F172A;
+        }
+
+        div.stButton > button:hover {
+            background-color: #E2E8F0;
+            color: #0F172A;
         }
 
         div.stTextInput > div > div > input {
-            border-radius: 16px;
-            background: white;
+            border-radius: 14px;
+            background: #F8FAFC;
             color: #111827 !important;
-            border: 1px solid #D1D5DB;
+            border: 1px solid #CBD5E1;
         }
 
+        /* =========================
+           REGLAS
+        ========================= */
         .bloque-reglas {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #E5E7EB;
-            margin-bottom: 24px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+            background: rgba(255,255,255,0.06);
+            border-radius: 18px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        /* =========================
+           CARRITO
+        ========================= */
+        .carrito-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
         }
 
         .carrito-total {
-            background: #ECFDF5;
+            background: #DCFCE7;
             border: 2px solid #22C55E;
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 18px;
+            padding: 18px;
             text-align: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-top: 18px;
+            margin-bottom: 18px;
         }
 
         .carrito-total-label {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: #166534;
         }
 
         .carrito-total-value {
-            font-size: 38px;
+            font-size: 34px;
             font-weight: 900;
             color: #14532D;
+        }
+
+        /* =========================
+           PRODUCTOS TIPO LISTA
+        ========================= */
+        .producto-row {
+            padding: 10px 0 8px 0;
+        }
+
+        .producto-nombre {
+            font-size: 18px;
+            font-weight: 800;
+            color: #F8FAFC;
+            line-height: 1.25;
+        }
+
+        .dato-secundario {
+            font-size: 14px;
+            color: #CBD5E1;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .venta-destacada {
+            font-size: 18px;
+            font-weight: 900;
+            color: #166534;
+            background-color: #DCFCE7;
+            padding: 10px 14px;
+            border-radius: 14px;
+            text-align: center;
+            display: inline-block;
+            min-width: 110px;
+            box-shadow: 0 4px 10px rgba(34,197,94,0.18);
+        }
+
+        .linea-producto {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.12);
+            margin: 8px 0 10px 0;
+        }
+
+        /* =========================
+           PLACEHOLDER IMAGEN
+        ========================= */
+        .pet-placeholder {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #CBD5E1;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           RESPONSIVE CELULAR
+        ========================= */
+        @media (max-width: 768px) {
+            .main .block-container {
+                padding-top: 0.5rem;
+                padding-bottom: 1rem;
+                padding-left: 0.8rem;
+                padding-right: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .section-subtitle {
+                font-size: 13px;
+            }
+
+            .producto-nombre {
+                font-size: 16px;
+            }
+
+            .dato-secundario {
+                font-size: 12px;
+            }
+
+            .venta-destacada {
+                font-size: 16px;
+                min-width: 95px;
+                padding: 8px 12px;
+            }
         }
     </style>
 """, unsafe_allow_html=True)
@@ -171,7 +257,7 @@ zona = pytz.timezone("America/Argentina/Buenos_Aires")
 # =========================
 if "logueado" not in st.session_state:
     st.session_state["logueado"] = True
-    
+
 if "productos_cacheados" not in st.session_state:
     st.session_state["productos_cacheados"] = []
 
@@ -260,17 +346,13 @@ df = pd.DataFrame(productos)
 # =========================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
 
-col_logo, col_titulo = st.columns([1, 5])
+try:
+    st.image("assets/logo.png", use_container_width=True)
+except:
+    st.write("🐾")
 
-with col_logo:
-    try:
-        st.image("assets/logo.png", width=150)
-    except:
-        st.write("🐾")
-
-with col_titulo:
-    st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-subtitle">Sistema de precios automático</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Sistema de precios automático</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -280,7 +362,7 @@ if st.session_state["ultima_actualizacion"]:
 # =========================
 # BUSCADOR + ACCIONES
 # =========================
-col1, col2, col3, col4 = st.columns([2.5, 1, 1, 1])
+col1, col2, col3, col4 = st.columns([2.8, 1, 1, 1])
 
 with col1:
     busqueda = st.text_input("Buscar producto")
@@ -414,24 +496,27 @@ if st.session_state["ver_carrito"]:
 st.header("📦 Productos")
 
 for i, row in df.iterrows():
-    st.markdown('<div class="producto-card">', unsafe_allow_html=True)
+    st.markdown('<div class="producto-row">', unsafe_allow_html=True)
 
-    col_img, col1, col2, col3, col4, col5 = st.columns([1.2, 4, 1, 1.3, 1.3, 1.8])
+    col_img, col1, col2, col3, col4, col5, col6 = st.columns([0.9, 4, 1, 1.3, 1.3, 1.8, 1])
 
     with col_img:
         if row.get("Imagen"):
             try:
-                st.image(row["Imagen"], width=90)
+                st.image(row["Imagen"], width=70)
             except:
-                st.image("https://placehold.co/90x90?text=Pet", width=90)
+                st.markdown('<div class="pet-placeholder">Pet</div>', unsafe_allow_html=True)
         else:
-            st.image("https://placehold.co/90x90?text=Pet", width=90)
+            st.markdown('<div class="pet-placeholder">Pet</div>', unsafe_allow_html=True)
 
     with col1:
         st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
 
     with col2:
-        st.write(f"{row['Peso']} kg")
+        st.markdown(
+            f"<div class='dato-secundario'>{row['Peso']} kg</div>",
+            unsafe_allow_html=True
+        )
 
     with col3:
         st.markdown(
@@ -451,10 +536,10 @@ for i, row in df.iterrows():
             unsafe_allow_html=True
         )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    with col6:
+        if st.button("Agregar", key=i):
+            agregar_al_carrito(row["Producto"], row["Venta"])
+            st.toast("Agregado al carrito")
 
-    if st.button("Agregar", key=i):
-        agregar_al_carrito(row["Producto"], row["Venta"])
-        st.toast("Agregado al carrito")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('<hr class="linea-producto">', unsafe_allow_html=True)
