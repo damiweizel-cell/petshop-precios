@@ -52,21 +52,21 @@ st.markdown("""
         }
 
         .section-title {
-            font-size: 30px;
+            font-size: 42px;
             font-weight: 900;
             color: #111827;
             margin-top: 8px;
             margin-bottom: 4px;
-            line-height: 1.15;
+            line-height: 1.1;
             text-align: center;
         }
 
         .section-subtitle {
-            font-size: 15px;
+            font-size: 16px;
             color: #374151;
             font-weight: 600;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         /* =========================
@@ -149,39 +149,24 @@ st.markdown("""
         }
 
         /* =========================
-           LINK BUTTON (WHATSAPP)
+           BOTÓN HTML ENVIAR
         ========================= */
-        a[data-testid="stLinkButton"] {
-    background-color: #25D366 !important;
-    color: #FFFFFF !important;
-    border-radius: 12px !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-    padding: 0.55rem 0.8rem !important;
-    text-decoration: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: auto !important;
-    min-width: auto !important;
-    white-space: nowrap !important;
-    border: none !important;
-}
-
-a[data-testid="stLinkButton"],
-a[data-testid="stLinkButton"]:visited,
-a[data-testid="stLinkButton"]:hover,
-a[data-testid="stLinkButton"]:active {
-    color: #FFFFFF !important;
-}
-
-a[data-testid="stLinkButton"] span,
-a[data-testid="stLinkButton"] div,
-a[data-testid="stLinkButton"] p,
-a[data-testid="stLinkButton"] * {
-    color: #FFFFFF !important;
-    fill: #FFFFFF !important;
-}
+        a.boton-enviar-fijo,
+        a.boton-enviar-fijo:visited,
+        a.boton-enviar-fijo:hover,
+        a.boton-enviar-fijo:active {
+            background: #25D366 !important;
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            padding: 8px 14px !important;
+            border-radius: 10px !important;
+            display: inline-block !important;
+            text-align: center !important;
+            min-width: 72px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.10) !important;
+        }
 
         /* =========================
            REGLAS
@@ -240,11 +225,11 @@ a[data-testid="stLinkButton"] * {
             }
 
             .section-title {
-                font-size: 24px;
+                font-size: 34px;
             }
 
             .section-subtitle {
-                font-size: 13px;
+                font-size: 14px;
             }
         }
     </style>
@@ -481,24 +466,14 @@ if st.session_state["ver_carrito"]:
         whatsapp_url = f"https://wa.me/?text={mensaje_codificado}"
 
         st.markdown(
-    f"""
-    <a href="{whatsapp_url_producto}" target="_blank" style="
-        background-color:#25D366;
-        color:#FFFFFF;
-        padding:8px 12px;
-        border-radius:10px;
-        font-weight:700;
-        text-decoration:none;
-        display:inline-block;
-        text-align:center;
-        font-size:14px;
-    " onmouseover="this.style.backgroundColor='#1DA851'" 
-      onmouseout="this.style.backgroundColor='#25D366'">
-        Enviar
-    </a>
-    """,
-    unsafe_allow_html=True
-)
+            f"""
+            <a href="{whatsapp_url}" target="_blank" class="boton-enviar-fijo">
+                📲 Enviar pedido por WhatsApp
+            </a>
+            """,
+            unsafe_allow_html=True
+        )
+
     colv1, colv2 = st.columns(2)
 
     with colv1:
@@ -585,7 +560,17 @@ for i, row in df.iterrows():
     with col3:
         mensaje_producto = generar_mensaje_producto(row["Producto"], row["Venta"])
         whatsapp_url_producto = f"https://wa.me/?text={mensaje_producto}"
-        st.link_button("Enviar", whatsapp_url_producto)
+
+        st.markdown(
+            f"""
+            <div style="display:flex; justify-content:center; align-items:center; margin-top:2px;">
+                <a href="{whatsapp_url_producto}" target="_blank" class="boton-enviar-fijo">
+                    Enviar
+                </a>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     # Línea separadora
     st.markdown(
