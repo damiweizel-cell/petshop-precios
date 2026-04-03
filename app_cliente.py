@@ -456,17 +456,17 @@ with b1:
 
 with b2:
     if st.button("🔎", use_container_width=True):
-    st.session_state["buscar_click"] = True
-    st.markdown(
-        """
-        <script>
-        setTimeout(function() {
-            document.getElementById("resultados").scrollIntoView({behavior: "smooth"});
-        }, 100);
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
+        st.session_state["buscar_click"] = True
+        st.markdown(
+            """
+            <script>
+            setTimeout(function() {
+                document.getElementById("resultados").scrollIntoView({behavior: "smooth"});
+            }, 100);
+            </script>
+            """,
+            unsafe_allow_html=True
+        )
 
 with b3:
     if st.button(f"🛒 {total_items()}", use_container_width=True):
