@@ -26,9 +26,6 @@ st.set_page_config(
 # =========================
 st.markdown("""
     <style>
-        /* =========================
-           FONDO GENERAL
-        ========================= */
         .stApp {
             background: linear-gradient(180deg, #E5E7EB 0%, #D1D5DB 45%, #C7CDD4 100%);
         }
@@ -39,9 +36,6 @@ st.markdown("""
             max-width: 1320px;
         }
 
-        /* =========================
-           HEADER
-        ========================= */
         .header-card {
             background: transparent;
             border-radius: 0;
@@ -69,9 +63,6 @@ st.markdown("""
             margin-bottom: 12px;
         }
 
-        /* =========================
-           INFO Y TEXTOS
-        ========================= */
         .stAlert {
             border-radius: 14px !important;
         }
@@ -90,9 +81,6 @@ st.markdown("""
             color: #111827 !important;
         }
 
-        /* =========================
-           INPUTS
-        ========================= */
         div.stTextInput > div > div > input {
             border-radius: 14px;
             background: #FFFFFF;
@@ -108,9 +96,6 @@ st.markdown("""
             color: #111827 !important;
         }
 
-        /* =========================
-           BOTONES GENERALES
-        ========================= */
         div.stButton > button {
             border-radius: 12px;
             font-weight: 700;
@@ -148,9 +133,6 @@ st.markdown("""
             color: inherit !important;
         }
 
-        /* =========================
-           BOTÓN HTML ENVIAR
-        ========================= */
         a.boton-enviar-fijo,
         a.boton-enviar-fijo:visited,
         a.boton-enviar-fijo:hover,
@@ -168,9 +150,6 @@ st.markdown("""
             box-shadow: 0 2px 6px rgba(0,0,0,0.10) !important;
         }
 
-        /* =========================
-           REGLAS
-        ========================= */
         .bloque-reglas {
             background: rgba(255,255,255,0.65);
             border-radius: 18px;
@@ -180,9 +159,6 @@ st.markdown("""
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        /* =========================
-           CARRITO
-        ========================= */
         .carrito-item {
             background: rgba(255,255,255,0.75);
             border: 1px solid rgba(0,0,0,0.06);
@@ -213,9 +189,27 @@ st.markdown("""
             color: #14532D;
         }
 
-        /* =========================
-           RESPONSIVE CELULAR
-        ========================= */
+        .bloque-aumento {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+
+        .titulo-aumento {
+            color: #B91C1C;
+            font-weight: 900;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .texto-aumento {
+            color: #7F1D1D;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .main .block-container {
                 padding-top: 0.4rem;
@@ -249,6 +243,9 @@ if "logueado" not in st.session_state:
 if "productos_cacheados" not in st.session_state:
     st.session_state["productos_cacheados"] = []
 
+if "precios_anteriores" not in st.session_state:
+    st.session_state["precios_anteriores"] = {}
+
 if "ultima_actualizacion" not in st.session_state:
     st.session_state["ultima_actualizacion"] = None
 
@@ -263,6 +260,9 @@ if "ver_carrito" not in st.session_state:
 
 if "mostrar_reglas" not in st.session_state:
     st.session_state["mostrar_reglas"] = False
+
+if "datos_cargados" not in st.session_state:
+    st.session_state["datos_cargados"] = False
 
 # =========================
 # FUNCIONES CARRITO
@@ -311,61 +311,69 @@ def generar_mensaje_producto(producto, venta):
     return urllib.parse.quote(mensaje)
 
 # =========================
-# CARGA DE PRODUCTOS
+# CARGA AUTOMÁTICA AL INGRESAR
 # =========================
-if not st.session_state["productos_cacheados"]:
+if not st.session_state["datos_cargados"]:
+    # Guardar precios anteriores antes de refrescar
+    precios_previos = {}
+    for p in st.session_state["productos_cacheados"]:
+        if "Producto" in p and "Venta" in p:
+            precios_previos[p["Producto"]] = p["Venta"]
+
+    st.session_state["precios_anteriores"] = precios_previos
+
+    # Cargar nuevos productos del proveedor
     productos = obtener_productos_proveedor()
+
+    # Calcular precios y detectar aumentos
+    for p in productos:
+        ganancia, venta = calcular_precio_venta(
+            p["Costo"],
+            p["Peso"],
+            st.session_state["reglas"]
+        )
+
+        p["Ganancia"] = ganancia
+        p["Venta"] = venta
+
+        precio_anterior = st.session_state["precios_anteriores"].get(p["Producto"], None)
+
+        if precio_anterior is not None and venta > precio_anterior:
+            p["Aumento"] = True
+        else:
+            p["Aumento"] = False
+
     st.session_state["productos_cacheados"] = productos
     st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
+    st.session_state["datos_cargados"] = True
 
 productos = st.session_state["productos_cacheados"]
-
-# =========================
-# CALCULAR PRECIOS
-# =========================
-for p in productos:
-    ganancia, venta = calcular_precio_venta(
-        p["Costo"],
-        p["Peso"],
-        st.session_state["reglas"]
-    )
-    p["Ganancia"] = ganancia
-    p["Venta"] = venta
-
 df = pd.DataFrame(productos)
 
 # =========================
 # HEADER (SIN LOGO)
 # =========================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
-
 st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
 st.markdown('<div class="section-subtitle">Sistema de precios automático</div>', unsafe_allow_html=True)
-
 st.markdown('</div>', unsafe_allow_html=True)
 
 if st.session_state["ultima_actualizacion"]:
-    st.info(f"🕒 Última actualización: {st.session_state['ultima_actualizacion']}")
+    st.info(f"🕒 Última actualización automática: {st.session_state['ultima_actualizacion']}")
 
 # =========================
 # BUSCADOR + ACCIONES
 # =========================
-col1, col2, col3, col4 = st.columns([2.8, 1, 1, 1])
+col1, col2, col3 = st.columns([3.2, 1, 1])
 
 with col1:
     busqueda = st.text_input("Buscar producto")
 
 with col2:
-    if st.button("Actualizar"):
-        st.cache_data.clear()
-        st.session_state["productos_cacheados"] = []
-        st.rerun()
-
-with col3:
     if st.button("Reglas"):
         st.session_state["mostrar_reglas"] = not st.session_state["mostrar_reglas"]
 
-with col4:
+with col3:
     if st.button(f"Carrito ({len(st.session_state['seleccionados'])})"):
         st.session_state["ver_carrito"] = True
         st.rerun()
@@ -385,6 +393,7 @@ if st.session_state["mostrar_reglas"]:
 
     if st.button("Guardar reglas"):
         st.session_state["reglas"] = reglas_editadas.copy()
+        st.session_state["datos_cargados"] = False
         st.success("Reglas guardadas correctamente")
         st.rerun()
 
@@ -489,7 +498,28 @@ if st.session_state["ver_carrito"]:
     st.stop()
 
 # =========================
-# CATÁLOGO MOBILE BIEN RESUELTO
+# PRODUCTOS CON AUMENTO
+# =========================
+productos_aumento = df[df["Aumento"] == True] if "Aumento" in df.columns else pd.DataFrame()
+
+if not productos_aumento.empty:
+    st.markdown(
+        "<h2 style='color:#B91C1C; margin-bottom: 10px;'>📈 Productos con aumento</h2>",
+        unsafe_allow_html=True
+    )
+
+    for _, row in productos_aumento.iterrows():
+        st.markdown(f"""
+            <div class="bloque-aumento">
+                <div class="titulo-aumento">{row['Producto']}</div>
+                <div class="texto-aumento">
+                    Nuevo precio: {formato_pesos(row['Venta'])}
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# =========================
+# CATÁLOGO PRINCIPAL
 # =========================
 st.markdown(
     "<h2 style='color:#111827; margin-bottom: 12px;'>📦 Productos</h2>",
@@ -497,6 +527,11 @@ st.markdown(
 )
 
 for i, row in df.iterrows():
+
+    if row.get("Aumento"):
+        nombre_html = f"{row['Producto']} <span style='color:#DC2626; font-weight:900;'>▲ Aumentó</span>"
+    else:
+        nombre_html = row['Producto']
 
     # Nombre del producto
     st.markdown(
@@ -508,7 +543,7 @@ for i, row in df.iterrows():
             margin-bottom:2px;
             line-height:1.25;
         ">
-            {row['Producto']}
+            {nombre_html}
         </div>
         """,
         unsafe_allow_html=True
