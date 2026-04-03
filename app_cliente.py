@@ -247,7 +247,7 @@ st.markdown("""
         }
 
         .hero-title {
-            font-size: 26px;
+            font-size: 20px;
         }
 
         .hero-text {
