@@ -228,57 +228,77 @@ button * {
            PRODUCTOS TIPO LISTA
         ========================= */
         .producto-row {
-            padding: 10px 0 8px 0;
-        }
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+}
 
-        .producto-nombre {
-            font-size: 18px;
-            font-weight: 800;
-            color: #F8FAFC;
-            line-height: 1.25;
-        }
+.producto-nombre {
+    font-size: 16px;
+    font-weight: 800;
+    color: #F8FAFC;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
 
-        .dato-secundario {
-            font-size: 14px;
-            color: #CBD5E1;
-            font-weight: 600;
-            text-align: center;
-        }
+.dato-secundario {
+    font-size: 13px;
+    color: #CBD5E1;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
 
-        .venta-destacada {
-            font-size: 18px;
-            font-weight: 900;
-            color: #166534;
-            background-color: #DCFCE7;
-            padding: 10px 14px;
-            border-radius: 14px;
-            text-align: center;
-            display: inline-block;
-            min-width: 110px;
-            box-shadow: 0 4px 10px rgba(34,197,94,0.18);
-        }
+.venta-destacada {
+    font-size: 17px;
+    font-weight: 900;
+    color: #166534;
+    background-color: #DCFCE7;
+    padding: 8px 12px;
+    border-radius: 12px;
+    text-align: center;
+    display: inline-block;
+    min-width: 95px;
+    box-shadow: 0 4px 10px rgba(34,197,94,0.18);
+    white-space: nowrap;
+}
 
-        .linea-producto {
-            border: none;
-            border-top: 1px solid rgba(255,255,255,0.12);
-            margin: 8px 0 10px 0;
-        }
+.linea-producto {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin: 4px 0 6px 0;
+}
 
-        /* =========================
-           PLACEHOLDER IMAGEN
-        ========================= */
-        .pet-placeholder {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #CBD5E1;
-            font-size: 28px;
-            font-weight: 700;
-        }
+/* Encabezados mini tipo planilla */
+.col-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: #93C5FD;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 8px;
+}
+
+/* Responsive celular */
+@media (max-width: 768px) {
+    .producto-nombre {
+        font-size: 14px;
+    }
+
+    .dato-secundario {
+        font-size: 12px;
+    }
+
+    .venta-destacada {
+        font-size: 15px;
+        min-width: 88px;
+        padding: 7px 10px;
+    }
+
+    .col-header {
+        font-size: 11px;
+    }
+}
 
         /* =========================
            RESPONSIVE CELULAR
