@@ -56,7 +56,7 @@ st.markdown("""
     }
 
     .titulo {
-        font-size: 46px;
+        font-size: 35px;
         font-weight: 900;
     }
 
@@ -122,13 +122,13 @@ st.markdown("""
     }
 
     .producto-nombre {
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 900;
         margin-bottom: 10px;
     }
 
     .precio-cliente {
-        font-size: 28px;
+        font-size: 20px;
         font-weight: 900;
         background: linear-gradient(135deg, #86EFAC, #22C55E);
         padding: 10px 14px;
