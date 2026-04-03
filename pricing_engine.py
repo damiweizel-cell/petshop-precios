@@ -7,8 +7,9 @@ def formato_pesos(valor):
     return f"$ {int(valor):,}".replace(",", ".")
 
 
-def redondear_a_1000_superior(valor):
-    return math.ceil(valor / 1000) * 1000
+# REDONDEA HACIA ABAJO AL MÚLTIPLO DE 1000 MÁS CERCANO
+def redondear_a_1000_inferior(valor):
+    return math.floor(valor / 1000) * 1000
 
 
 def obtener_margen(peso, reglas_df):
