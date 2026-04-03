@@ -152,23 +152,36 @@ st.markdown("""
            LINK BUTTON (WHATSAPP)
         ========================= */
         a[data-testid="stLinkButton"] {
-            background-color: #25D366 !important;
-            color: white !important;
-            border-radius: 12px !important;
-            font-weight: 700 !important;
-            text-align: center !important;
-            padding: 0.55rem 0.8rem !important;
-            text-decoration: none !important;
-            display: inline-block !important;
-            width: auto !important;
-            min-width: auto !important;
-            white-space: nowrap !important;
-            border: none !important;
-        }
+    background-color: #25D366 !important;
+    color: #FFFFFF !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    padding: 0.55rem 0.8rem !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: auto !important;
+    white-space: nowrap !important;
+    border: none !important;
+}
 
-        a[data-testid="stLinkButton"] * {
-            color: white !important;
-        }
+a[data-testid="stLinkButton"],
+a[data-testid="stLinkButton"]:visited,
+a[data-testid="stLinkButton"]:hover,
+a[data-testid="stLinkButton"]:active {
+    color: #FFFFFF !important;
+}
+
+a[data-testid="stLinkButton"] span,
+a[data-testid="stLinkButton"] div,
+a[data-testid="stLinkButton"] p,
+a[data-testid="stLinkButton"] * {
+    color: #FFFFFF !important;
+    fill: #FFFFFF !important;
+}
 
         /* =========================
            REGLAS
