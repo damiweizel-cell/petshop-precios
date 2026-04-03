@@ -584,48 +584,56 @@ if st.session_state["ver_carrito"]:
 # =========================
 st.header("📦 Productos")
 
+# Encabezado tipo lista / planilla
+col1, col2, col3, col4, col5 = st.columns([5.5, 1.5, 1.5, 1.8, 1.4])
+
+with col1:
+    st.markdown("<div class='col-header'>Descripción</div>", unsafe_allow_html=True)
+with col2:
+    st.markdown("<div class='col-header'>Costo</div>", unsafe_allow_html=True)
+with col3:
+    st.markdown("<div class='col-header'>Ganancia</div>", unsafe_allow_html=True)
+with col4:
+    st.markdown("<div class='col-header'>Venta</div>", unsafe_allow_html=True)
+with col5:
+    st.markdown("<div class='col-header'>Acción</div>", unsafe_allow_html=True)
+
+st.markdown('<hr class="linea-producto">', unsafe_allow_html=True)
+
 for i, row in df.iterrows():
     st.markdown('<div class="producto-row">', unsafe_allow_html=True)
 
-    col_img, col1, col2, col3, col4, col5, col6 = st.columns([0.9, 4, 1, 1.3, 1.3, 1.8, 1])
-
-    with col_img:
-        if row.get("Imagen"):
-            try:
-                st.image(row["Imagen"], width=70)
-            except:
-                st.markdown('<div class="pet-placeholder">Pet</div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="pet-placeholder">Pet</div>', unsafe_allow_html=True)
+    col1, col2, col3, col4, col5 = st.columns([5.5, 1.5, 1.5, 1.8, 1.4])
 
     with col1:
-        st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
-
-    with col2:
+        st.markdown(
+            f"<div class='producto-nombre'>{row['Producto']}</div>",
+            unsafe_allow_html=True
+        )
         st.markdown(
             f"<div class='dato-secundario'>{row['Peso']} kg</div>",
             unsafe_allow_html=True
         )
 
+    with col2:
+        st.markdown(
+            f"<div class='dato-secundario'><strong>{formato_pesos(row['Costo'])}</strong></div>",
+            unsafe_allow_html=True
+        )
+
     with col3:
         st.markdown(
-            f"<div class='dato-secundario'>Costo<br><strong>{formato_pesos(row['Costo'])}</strong></div>",
+            f"<div class='dato-secundario'><strong>{formato_pesos(row['Ganancia'])}</strong></div>",
             unsafe_allow_html=True
         )
 
     with col4:
         st.markdown(
-            f"<div class='dato-secundario'>Ganancia<br><strong>{formato_pesos(row['Ganancia'])}</strong></div>",
-            unsafe_allow_html=True
-        )
-
-    with col5:
-        st.markdown(
             f"<div class='venta-destacada'>{formato_pesos(row['Venta'])}</div>",
             unsafe_allow_html=True
         )
 
-    with col6:
+    with col5:
         if st.button("Agregar", key=i):
             agregar_al_carrito(row["Producto"], row["Venta"])
             st.toast("Agregado al carrito")
