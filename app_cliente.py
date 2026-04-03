@@ -33,43 +33,54 @@ st.markdown("""
 
     .main .block-container {
         max-width: 1250px;
-        padding-top: 1rem;
-        padding-bottom: 2rem;
+        padding-top: 0.4rem;
+        padding-bottom: 1.2rem;
     }
 
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC;
     }
 
-    /* LIMPIAR CONTENEDORES RAROS */
     div[data-testid="stVerticalBlock"] > div {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
     }
 
-    /* HEADER */
+    /* =========================
+       HEADER
+    ========================= */
     .header-clean {
-        padding: 10px 0 20px 0;
+        padding: 0 0 10px 0;
         border-bottom: 1px solid rgba(255,255,255,0.08);
-        margin-bottom: 18px;
+        margin-bottom: 12px;
     }
 
     .titulo {
         font-size: 35px;
         font-weight: 900;
+        margin-top: -12px;
+        margin-bottom: 2px;
+        line-height: 1.05;
     }
 
     .subtitulo {
-        font-size: 20px;
+        font-size: 19px;
         color: #CBD5E1;
+        margin-top: 0;
     }
 
-    /* LABEL BUSCADOR */
+    .logo-wrap {
+        margin-bottom: -28px;
+    }
+
+    /* =========================
+       BUSCADOR
+    ========================= */
     .busqueda-label {
         font-size: 18px;
         font-weight: 900;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     .busqueda-ayuda {
@@ -77,106 +88,27 @@ st.markdown("""
         color: #CBD5E1;
         font-style: italic;
         font-weight: 500;
-        margin-left: 10px;
+        margin-left: 8px;
     }
 
-    /* INFO */
-    .info-banner {
-        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-        border-radius: 16px;
-        padding: 14px;
-        margin-bottom: 20px;
-        font-weight: 800;
-    }
-
-    /* HERO */
-    .hero-box {
-        border-radius: 20px;
-        padding: 28px;
-        margin-bottom: 24px;
-        border: 1px solid rgba(147,197,253,0.10);
-    }
-
-    .hero-title {
-        font-size: 42px;
-        font-weight: 900;
-    }
-
-    .hero-text {
-        font-size: 20px;
-        margin-bottom: 20px;
-    }
-
-    /* BLOQUE INFO */
-    .info-box-unico {
-        background: rgba(30,41,59,0.6);
-        border-radius: 20px;
-        padding: 22px;
-        margin-bottom: 26px;
-    }
-
-    .info-item-title {
-        font-size: 22px;
-        font-weight: 900;
-    }
-
-    .info-item-text {
-        font-size: 16px;
-        color: #CBD5E1;
-    }
-
-    /* PRODUCTOS */
-    .producto-card {
-        padding: 18px 0 22px 0;
-    }
-
-    .producto-nombre {
-        font-size: 22px;
-        font-weight: 900;
-        margin-bottom: 10px;
-    }
-
-    .precio-cliente {
-        font-size: 20px;
-        font-weight: 900;
-        background: linear-gradient(135deg, #86EFAC, #22C55E);
-        padding: 10px 14px;
-        border-radius: 14px;
-        text-align: center;
-        display: inline-block;
-        min-width: 160px;
-        color: #052E16 !important;
-    }
-
-    /* INPUT BUSCADOR */
     div.stTextInput > div > div > input {
-        font-size: 18px !important;
+        font-size: 17px !important;
         font-weight: 700 !important;
         background: #F8FAFC !important;
         color: #111827 !important;
         border-radius: 12px !important;
-        min-height: 52px !important;
+        min-height: 48px !important;
+        padding-right: 42px !important;
     }
 
-    /* INPUT CANTIDAD */
-    div[data-testid="stNumberInput"] input {
-        font-size: 20px !important;
-        font-weight: 900 !important;
-        text-align: center !important;
-        background: #F8FAFC !important;
-        color: #111827 !important;
-        border-radius: 12px !important;
-        min-height: 52px !important;
-    }
-
-    /* BOTONES */
     div.stButton > button {
-        border-radius: 14px !important;
+        border-radius: 12px !important;
         font-weight: 900 !important;
-        min-height: 52px !important;
+        min-height: 48px !important;
         background: #E5E7EB !important;
         color: #111827 !important;
-        font-size: 16px !important;
+        font-size: 15px !important;
+        padding: 0.3rem 0.7rem !important;
     }
 
     div.stButton > button p,
@@ -185,10 +117,103 @@ st.markdown("""
         color: #111827 !important;
     }
 
-    div[data-testid="stLinkButton"] a {
-        border-radius: 14px !important;
+    /* =========================
+       INFO
+    ========================= */
+    .info-banner {
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 18px;
+        font-weight: 800;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+    .hero-title {
+        font-size: 38px;
+        font-weight: 900;
+        line-height: 1.05;
+    }
+
+    .hero-text {
+        font-size: 19px;
+        margin-bottom: 18px;
+    }
+
+    /* =========================
+       BLOQUE INFO
+    ========================= */
+    .info-box-unico {
+        background: rgba(30,41,59,0.6);
+        border-radius: 20px;
+        padding: 18px;
+        margin-bottom: 18px;
+    }
+
+    .info-item-title {
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .info-item-text {
+        font-size: 15px;
+        color: #CBD5E1;
+    }
+
+    /* =========================
+       PRODUCTOS
+    ========================= */
+    .producto-card {
+        padding: 10px 0 10px 0;
+    }
+
+    .producto-nombre {
+        font-size: 20px;
+        font-weight: 900;
+        margin-bottom: 8px;
+        line-height: 1.25;
+    }
+
+    .precio-cliente {
+        font-size: 18px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #86EFAC, #22C55E);
+        padding: 10px 14px;
+        border-radius: 14px;
+        text-align: center;
+        display: inline-block;
+        min-width: 150px;
+        color: #052E16 !important;
+        margin-bottom: 8px;
+    }
+
+    div[data-testid="stNumberInput"] input {
+        font-size: 18px !important;
         font-weight: 900 !important;
-        min-height: 52px !important;
+        text-align: center !important;
+        background: #F8FAFC !important;
+        color: #111827 !important;
+        border-radius: 12px !important;
+        min-height: 48px !important;
+    }
+
+    label {
+        margin-bottom: 2px !important;
+    }
+
+    hr {
+        border: none;
+        height: 1px;
+        background: rgba(148,163,184,0.22);
+        margin: 10px 0 12px 0;
+    }
+
+    div[data-testid="stLinkButton"] a {
+        border-radius: 12px !important;
+        font-weight: 900 !important;
+        min-height: 48px !important;
         background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%) !important;
         color: white !important;
         text-decoration: none !important;
@@ -197,48 +222,77 @@ st.markdown("""
         align-items: center !important;
     }
 
-    /* SEPARADOR */
-    hr {
-        border: none;
-        height: 1px;
-        background: rgba(148,163,184,0.3);
-        margin: 20px 0;
-    }
-
-    /* MOBILE */
+    /* =========================
+       MOBILE
+    ========================= */
     @media (max-width: 768px) {
+        .main .block-container {
+            padding-top: 0.2rem;
+            padding-left: 0.8rem;
+            padding-right: 0.8rem;
+            padding-bottom: 1rem;
+        }
+
+        .logo-wrap {
+            margin-bottom: -38px;
+        }
+
         .titulo {
-            font-size: 28px;
+            font-size: 27px;
+            margin-top: -18px;
         }
 
         .subtitulo {
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .hero-title {
-            font-size: 30px;
+            font-size: 26px;
         }
 
         .hero-text {
-            font-size: 17px;
+            font-size: 16px;
         }
 
         .producto-nombre {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .precio-cliente {
-            font-size: 18px;
-            min-width: 140px;
-            margin-top: 8px;
+            font-size: 17px;
+            min-width: 130px;
+            padding: 9px 12px;
         }
 
         .info-item-title {
-            font-size: 18px;
+            font-size: 17px;
         }
 
         .info-item-text {
-            font-size: 14px;
+            font-size: 13px;
+        }
+
+        .busqueda-label {
+            font-size: 16px;
+        }
+
+        .busqueda-ayuda {
+            font-size: 12px;
+        }
+
+        div.stButton > button {
+            min-height: 46px !important;
+            font-size: 14px !important;
+        }
+
+        div[data-testid="stNumberInput"] input {
+            min-height: 46px !important;
+            font-size: 17px !important;
+        }
+
+        div.stTextInput > div > div > input {
+            min-height: 46px !important;
+            font-size: 16px !important;
         }
     }
 </style>
@@ -324,10 +378,12 @@ df_destacados = df_destacados.sort_values("Producto")
 # =========================
 st.markdown('<div class="header-clean">', unsafe_allow_html=True)
 
-c1, c2 = st.columns([2.1, 4.4])
+c1, c2 = st.columns([1.7, 4.3])
 
 with c1:
-    st.image("assets/logo.png", width=360)
+    st.markdown('<div class="logo-wrap">', unsafe_allow_html=True)
+    st.image("assets/logo.png", width=300)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with c2:
     st.markdown('<div class="titulo">Valentín Pet Food</div>', unsafe_allow_html=True)
@@ -343,17 +399,21 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-col1, col2, col3 = st.columns([5, 0.8, 1.2])
+col1, col2, col3 = st.columns([4.8, 0.8, 1.4])
 
 with col1:
-    busqueda = st.text_input("", placeholder="Ej: Old Prince, pipetas, piedras sanitarias...", label_visibility="collapsed")
+    busqueda = st.text_input(
+        "",
+        placeholder="Ej: Old Prince, pipetas, piedras sanitarias...",
+        label_visibility="collapsed"
+    )
 
 with col2:
     if st.button("🔎", use_container_width=True):
         st.session_state["buscar_click"] = True
 
 with col3:
-    if st.button(f"Carrito ({total_items()})", use_container_width=True):
+    if st.button(f"🛒 {total_items()}", use_container_width=True):
         st.session_state["ver_carrito"] = True
         st.rerun()
 
