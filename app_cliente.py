@@ -281,7 +281,7 @@ st.markdown("""
         }
 
         div.stButton > button {
-            min-height: 46px !important;
+            min-height: 30px !important;
             font-size: 14px !important;
         }
 
