@@ -166,7 +166,7 @@ st.markdown("""
        PRODUCTOS
     ========================= */
     .producto-card {
-        padding: 10px 0 10px 0;
+        padding: 6px 0 6px 0;
     }
 
     .producto-nombre {
@@ -207,7 +207,7 @@ st.markdown("""
         border: none;
         height: 1px;
         background: rgba(148,163,184,0.22);
-        margin: 10px 0 12px 0;
+        margin: 6px 0 8px 0;
     }
 
     div[data-testid="stLinkButton"] a {
@@ -226,75 +226,91 @@ st.markdown("""
        MOBILE
     ========================= */
     @media (max-width: 768px) {
-        .main .block-container {
-            padding-top: 0.2rem;
-            padding-left: 0.8rem;
-            padding-right: 0.8rem;
-            padding-bottom: 1rem;
-        }
-
-        .logo-wrap {
-            margin-bottom: -38px;
-        }
-
-        .titulo {
-            font-size: 27px;
-            margin-top: -18px;
-        }
-
-        .subtitulo {
-            font-size: 15px;
-        }
-
-        .hero-title {
-            font-size: 20px;
-        }
-
-        .hero-text {
-            font-size: 16px;
-        }
-
-        .producto-nombre {
-            font-size: 18px;
-        }
-
-        .precio-cliente {
-            font-size: 17px;
-            min-width: 130px;
-            padding: 9px 12px;
-        }
-
-        .info-item-title {
-            font-size: 17px;
-        }
-
-        .info-item-text {
-            font-size: 13px;
-        }
-
-        .busqueda-label {
-            font-size: 16px;
-        }
-
-        .busqueda-ayuda {
-            font-size: 12px;
-        }
-
-        div.stButton > button {
-            min-height: 30px !important;
-            font-size: 14px !important;
-        }
-
-        div[data-testid="stNumberInput"] input {
-            min-height: 46px !important;
-            font-size: 17px !important;
-        }
-
-        div.stTextInput > div > div > input {
-            min-height: 46px !important;
-            font-size: 16px !important;
-        }
+    .main .block-container {
+        padding-top: 0.2rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+        padding-bottom: 1rem;
     }
+
+    .logo-wrap {
+        margin-bottom: -48px;
+    }
+
+    .titulo {
+        font-size: 27px;
+        margin-top: -24px;
+    }
+
+    .subtitulo {
+        font-size: 15px;
+    }
+
+    .hero-title {
+        font-size: 26px;
+    }
+
+    .hero-text {
+        font-size: 16px;
+    }
+
+    .producto-nombre {
+        font-size: 18px;
+    }
+
+    .precio-cliente {
+        font-size: 17px;
+        min-width: 130px;
+        padding: 9px 12px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+
+    .info-item-title {
+        font-size: 17px;
+    }
+
+    .info-item-text {
+        font-size: 13px;
+    }
+
+    .busqueda-label {
+        font-size: 16px;
+    }
+
+    .busqueda-ayuda {
+        font-size: 12px;
+    }
+
+    div.stButton > button {
+        min-height: 40px !important;
+        font-size: 13px !important;
+        padding: 0.2rem 0.45rem !important;
+    }
+
+    div[data-testid="stNumberInput"] input {
+        min-height: 40px !important;
+        font-size: 15px !important;
+    }
+
+    div.stTextInput > div > div > input {
+        min-height: 40px !important;
+        font-size: 15px !important;
+    }
+
+    hr {
+        margin: 8px 0 10px 0 !important;
+    }
+
+    .producto-card {
+        padding: 6px 0 6px 0 !important;
+    }
+
+    label {
+        margin-bottom: 0px !important;
+        font-size: 13px !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -399,24 +415,25 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-col1, col2, col3 = st.columns([4.8, 0.8, 1.4])
+busq1, busq2 = st.columns([4.8, 1.2], gap="small")
 
-with col1:
+with busq1:
     busqueda = st.text_input(
         "",
         placeholder="Ej: Old Prince, pipetas, piedras sanitarias...",
         label_visibility="collapsed"
     )
 
-with col2:
-    if st.button("🔎", use_container_width=True):
-        st.session_state["buscar_click"] = True
-
-with col3:
+with busq2:
     if st.button(f"🛒 {total_items()}", use_container_width=True):
         st.session_state["ver_carrito"] = True
         st.rerun()
 
+# lupa integrada debajo del input, pero visualmente pegada al buscador
+buscar = st.button("🔎 Buscar", use_container_width=True)
+if buscar:
+    st.session_state["buscar_click"] = True
+    
 # =========================
 # INFO
 # =========================
@@ -495,25 +512,26 @@ for i, row in df_mostrar.iterrows():
             unsafe_allow_html=True
         )
 
-    # cantidad + botón
-    c1, c2 = st.columns([1.25, 2.75], gap="small")
+    # cantidad + botón (más compacto y estable en mobile)
+c1, c2 = st.columns([1.1, 2.9], gap="small")
 
-    with c1:
-        cantidad = st.number_input(
-            "Cantidad",
-            min_value=1,
-            max_value=99,
-            value=1,
-            step=1,
-            key=f"prod{i}"
-        )
+with c1:
+    cantidad = st.number_input(
+        "Cantidad",
+        min_value=1,
+        max_value=99,
+        value=1,
+        step=1,
+        key=f"prod{i}",
+        label_visibility="visible"
+    )
 
-    with c2:
-        st.markdown("<div style='height: 23px;'></div>", unsafe_allow_html=True)
-        if st.button("Agregar al carrito", key=f"btn{i}", use_container_width=True):
-            agregar(row["Producto"], row["Venta"], cantidad)
-            st.toast("✅ Producto agregado")
-            st.rerun()
+with c2:
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+    if st.button("Agregar al carrito", key=f"btn{i}", use_container_width=True):
+        agregar(row["Producto"], row["Venta"], cantidad)
+        st.toast("✅ Producto agregado")
+        st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
