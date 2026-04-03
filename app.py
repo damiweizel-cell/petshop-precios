@@ -169,15 +169,9 @@ zona = pytz.timezone("America/Argentina/Buenos_Aires")
 # =========================
 # SESSION STATE
 # =========================
-if "usuario" not in st.session_state:
-    st.session_state["usuario"] = "carolinak"
-
-if "password" not in st.session_state:
-    st.session_state["password"] = "caro100"
-
 if "logueado" not in st.session_state:
-    st.session_state["logueado"] = False
-
+    st.session_state["logueado"] = True
+    
 if "productos_cacheados" not in st.session_state:
     st.session_state["productos_cacheados"] = []
 
@@ -195,26 +189,6 @@ if "ver_carrito" not in st.session_state:
 
 if "mostrar_reglas" not in st.session_state:
     st.session_state["mostrar_reglas"] = False
-
-# =========================
-# LOGIN
-# =========================
-def pantalla_login():
-    st.markdown("## 🔐 Iniciar sesión")
-
-    usuario = st.text_input("Usuario")
-    password = st.text_input("Contraseña", type="password")
-
-    if st.button("Ingresar"):
-        if usuario == st.session_state["usuario"] and password == st.session_state["password"]:
-            st.session_state["logueado"] = True
-            st.rerun()
-        else:
-            st.error("Datos incorrectos")
-
-if not st.session_state["logueado"]:
-    pantalla_login()
-    st.stop()
 
 # =========================
 # FUNCIONES CARRITO
