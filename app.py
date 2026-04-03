@@ -480,8 +480,24 @@ if st.session_state["ver_carrito"]:
         mensaje_codificado = urllib.parse.quote(mensaje)
         whatsapp_url = f"https://wa.me/?text={mensaje_codificado}"
 
-        st.link_button("📲 Enviar pedido por WhatsApp", whatsapp_url, use_container_width=True)
-
+        st.markdown(
+    f"""
+    <a href="{whatsapp_url_producto}" target="_blank" style="
+        background-color:#25D366;
+        color:#FFFFFF;
+        padding:8px 12px;
+        border-radius:10px;
+        font-weight:700;
+        text-decoration:none;
+        display:inline-block;
+        text-align:center;
+        font-size:14px;
+    ">
+        Enviar
+    </a>
+    """,
+    unsafe_allow_html=True
+)
     colv1, colv2 = st.columns(2)
 
     with colv1:
