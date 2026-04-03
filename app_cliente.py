@@ -65,10 +65,19 @@ st.markdown("""
         color: #CBD5E1;
     }
 
-    /* BUSCADOR */
-    .busqueda-box {
-        margin-top: 18px;
-        margin-bottom: 12px;
+    /* LABEL BUSCADOR */
+    .busqueda-label {
+        font-size: 18px;
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
+
+    .busqueda-ayuda {
+        font-size: 14px;
+        color: #CBD5E1;
+        font-style: italic;
+        font-weight: 500;
+        margin-left: 10px;
     }
 
     /* INFO */
@@ -134,6 +143,19 @@ st.markdown("""
         padding: 10px 14px;
         border-radius: 14px;
         text-align: center;
+        display: inline-block;
+        min-width: 160px;
+        color: #052E16 !important;
+    }
+
+    /* INPUT BUSCADOR */
+    div.stTextInput > div > div > input {
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        background: #F8FAFC !important;
+        color: #111827 !important;
+        border-radius: 12px !important;
+        min-height: 52px !important;
     }
 
     /* INPUT CANTIDAD */
@@ -144,15 +166,35 @@ st.markdown("""
         background: #F8FAFC !important;
         color: #111827 !important;
         border-radius: 12px !important;
+        min-height: 52px !important;
     }
 
     /* BOTONES */
     div.stButton > button {
         border-radius: 14px !important;
         font-weight: 900 !important;
-        min-height: 50px !important;
+        min-height: 52px !important;
         background: #E5E7EB !important;
         color: #111827 !important;
+        font-size: 16px !important;
+    }
+
+    div.stButton > button p,
+    div.stButton > button span,
+    div.stButton > button div {
+        color: #111827 !important;
+    }
+
+    div[data-testid="stLinkButton"] a {
+        border-radius: 14px !important;
+        font-weight: 900 !important;
+        min-height: 52px !important;
+        background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%) !important;
+        color: white !important;
+        text-decoration: none !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
 
     /* SEPARADOR */
@@ -163,6 +205,42 @@ st.markdown("""
         margin: 20px 0;
     }
 
+    /* MOBILE */
+    @media (max-width: 768px) {
+        .titulo {
+            font-size: 28px;
+        }
+
+        .subtitulo {
+            font-size: 16px;
+        }
+
+        .hero-title {
+            font-size: 30px;
+        }
+
+        .hero-text {
+            font-size: 17px;
+        }
+
+        .producto-nombre {
+            font-size: 20px;
+        }
+
+        .precio-cliente {
+            font-size: 18px;
+            min-width: 140px;
+            margin-top: 8px;
+        }
+
+        .info-item-title {
+            font-size: 18px;
+        }
+
+        .info-item-text {
+            font-size: 14px;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -177,6 +255,9 @@ if "carrito" not in st.session_state:
 
 if "ver_carrito" not in st.session_state:
     st.session_state["ver_carrito"] = False
+
+if "buscar_click" not in st.session_state:
+    st.session_state["buscar_click"] = False
 
 zona = pytz.timezone("America/Argentina/Buenos_Aires")
 
@@ -227,14 +308,26 @@ for p in st.session_state["productos"]:
 df = pd.DataFrame(st.session_state["productos"])
 
 # =========================
+# DESTACADOS PORTADA
+# =========================
+MARCAS_DESTACADAS = ["old prince", "biopet", "maintenance", "excellent"]
+
+def es_destacado(nombre):
+    nombre = str(nombre).lower()
+    return any(marca in nombre for marca in MARCAS_DESTACADAS)
+
+df_destacados = df[df["Producto"].apply(es_destacado)].copy()
+df_destacados = df_destacados.sort_values("Producto")
+
+# =========================
 # HEADER
 # =========================
 st.markdown('<div class="header-clean">', unsafe_allow_html=True)
 
-c1, c2 = st.columns([1.4, 5])
+c1, c2 = st.columns([2.1, 4.4])
 
 with c1:
-    st.image("assets/logo.png", width=260)
+    st.image("assets/logo.png", width=360)
 
 with c2:
     st.markdown('<div class="titulo">Valentín Pet Food</div>', unsafe_allow_html=True)
@@ -245,18 +338,22 @@ st.markdown('</div>', unsafe_allow_html=True)
 # =========================
 # BUSCADOR
 # =========================
-col1, col2, col3 = st.columns([4,1,1])
+st.markdown(
+    '<div class="busqueda-label">Buscar producto <span class="busqueda-ayuda">escribí el nombre y presioná la lupa</span></div>',
+    unsafe_allow_html=True
+)
+
+col1, col2, col3 = st.columns([5, 0.8, 1.2])
 
 with col1:
-    busqueda = st.text_input("Buscar producto")
+    busqueda = st.text_input("", placeholder="Ej: Old Prince, pipetas, piedras sanitarias...", label_visibility="collapsed")
 
 with col2:
-    if st.button("Actualizar"):
-        st.session_state["productos"] = obtener_productos_proveedor()
-        st.rerun()
+    if st.button("🔎", use_container_width=True):
+        st.session_state["buscar_click"] = True
 
 with col3:
-    if st.button(f"Carrito ({total_items()})"):
+    if st.button(f"Carrito ({total_items()})", use_container_width=True):
         st.session_state["ver_carrito"] = True
         st.rerun()
 
@@ -278,7 +375,7 @@ with h1:
     st.markdown('<div class="hero-text">Comprá fácil y rápido por WhatsApp</div>', unsafe_allow_html=True)
 
     st.link_button(
-        "Consultas por Whatsapp",
+        "Consultas por WhatsApp",
         f"https://wa.me/5491141645510?text={mensaje_whatsapp_consulta()}"
     )
 
@@ -294,30 +391,34 @@ i1, i2, i3 = st.columns(3)
 
 with i1:
     st.markdown("<div class='info-item-title'>🐾 Productos seleccionados</div>", unsafe_allow_html=True)
-    st.markdown("<div class='info-item-text'>Alimentos y artículos destacados</div>", unsafe_allow_html=True)
+    st.markdown("<div class='info-item-text'>Mostramos alimentos destacados para tu mascota.</div>", unsafe_allow_html=True)
 
 with i2:
     st.markdown("<div class='info-item-title'>📦 Compra simple</div>", unsafe_allow_html=True)
-    st.markdown("<div class='info-item-text'>Armá tu pedido rápido</div>", unsafe_allow_html=True)
+    st.markdown("<div class='info-item-text'>Elegí, agregá al carrito y enviá tu pedido.</div>", unsafe_allow_html=True)
 
 with i3:
     st.markdown("<div class='info-item-title'>💬 WhatsApp</div>", unsafe_allow_html=True)
-    st.markdown("<div class='info-item-text'>Atención directa</div>", unsafe_allow_html=True)
+    st.markdown("<div class='info-item-text'>Atención directa y pedidos rápidos.</div>", unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
 # FILTRO
 # =========================
-if busqueda:
-    df_mostrar = df[df["Producto"].str.contains(busqueda, case=False)]
+mostrar_busqueda = st.session_state["buscar_click"] and busqueda.strip() != ""
+
+if mostrar_busqueda:
+    df_mostrar = df[df["Producto"].str.contains(busqueda, case=False, na=False)].copy()
+    titulo_productos = "🔎 Resultados de búsqueda"
 else:
-    df_mostrar = df
+    df_mostrar = df_destacados.copy()
+    titulo_productos = "🐶🐱 Productos destacados"
 
 # =========================
 # PRODUCTOS
 # =========================
-st.markdown("## 🐶🐱 Productos")
+st.markdown(f"## {titulo_productos}")
 
 for i, row in df_mostrar.iterrows():
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
@@ -330,14 +431,24 @@ for i, row in df_mostrar.iterrows():
     with t2:
         st.markdown(f"<div class='precio-cliente'>{formato_pesos(row['Venta'])}</div>", unsafe_allow_html=True)
 
-    c1, c2 = st.columns([1,3])
+    # IMPORTANTE: en mobile Streamlit puede apilar columnas sí o sí.
+    # Este reparto minimiza ese problema y lo deja mucho mejor.
+    c1, c2 = st.columns([1.2, 2.8], vertical_alignment="bottom")
 
     with c1:
-        cantidad = st.number_input("", 1, 99, 1, key=f"prod{i}")
+        cantidad = st.number_input(
+            "Cantidad",
+            min_value=1,
+            max_value=99,
+            value=1,
+            step=1,
+            key=f"prod{i}"
+        )
 
     with c2:
         if st.button("Agregar al carrito", key=f"btn{i}", use_container_width=True):
             agregar(row["Producto"], row["Venta"], cantidad)
+            st.toast("✅ Producto agregado")
             st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
