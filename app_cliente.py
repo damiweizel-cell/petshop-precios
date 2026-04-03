@@ -111,15 +111,15 @@ st.markdown("""
        BOTONES
     ========================= */
     div.stButton > button {
-        border-radius: 12px !important;
-        font-weight: 900 !important;
-        min-height: 42px !important;
-        background: #E5E7EB !important;
-        color: #111827 !important;
-        font-size: 13px !important;
-        padding: 0.15rem 0.5rem !important;
-        border: none !important;
-    }
+    border-radius: 10px !important;
+    font-weight: 900 !important;
+    min-height: 38px !important;
+    background: #E5E7EB !important;
+    color: #111827 !important;
+    font-size: 13px !important;
+    padding: 0.2rem 0.6rem !important;
+    width: auto !important; /* 🔥 CLAVE */
+}
 
     div.stButton > button p,
     div.stButton > button span,
@@ -225,15 +225,19 @@ st.markdown("""
         margin-bottom: 6px;
     }
 
+    div[data-testid="stNumberInput"] {
+    max-width: 80px !important;
+}
+
     div[data-testid="stNumberInput"] input {
-        font-size: 15px !important;
-        font-weight: 900 !important;
-        text-align: center !important;
-        background: #F8FAFC !important;
-        color: #111827 !important;
-        border-radius: 12px !important;
-        min-height: 42px !important;
-    }
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+    background: #F8FAFC !important;
+    color: #111827 !important;
+    border-radius: 10px !important;
+    min-height: 38px !important;
+}
 
     label {
         margin-bottom: 1px !important;
@@ -452,7 +456,17 @@ with b1:
 
 with b2:
     if st.button("🔎", use_container_width=True):
-        st.session_state["buscar_click"] = True
+    st.session_state["buscar_click"] = True
+    st.markdown(
+        """
+        <script>
+        setTimeout(function() {
+            document.getElementById("resultados").scrollIntoView({behavior: "smooth"});
+        }, 100);
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
 
 with b3:
     if st.button(f"🛒 {total_items()}", use_container_width=True):
@@ -608,9 +622,11 @@ for i, row in df_mostrar.iterrows():
             f"<div class='precio-cliente'>{formato_pesos(row['Venta'])}</div>",
             unsafe_allow_html=True
         )
+        
+        st.markdown('<div id="resultados"></div>', unsafe_allow_html=True)
 
     # Cantidad + botón (lo más compacto posible en Streamlit)
-    c1, c2 = st.columns([1.25, 2.75], gap="small")
+    c1, c2 = st.columns([1, 2], gap="small")
 
     with c1:
         cantidad = st.number_input(
@@ -624,7 +640,7 @@ for i, row in df_mostrar.iterrows():
 
     with c2:
         st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-        if st.button("Agregar al carrito", key=f"btn{i}", use_container_width=True):
+        if st.button("🛒 Agregar", key=f"btn{i}")
             agregar(row["Producto"], row["Venta"], cantidad)
             st.toast("✅ Producto agregado")
             st.rerun()
