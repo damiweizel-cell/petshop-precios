@@ -4,337 +4,66 @@ from datetime import datetime
 import pytz
 import urllib.parse
 
-from pricing_engine import (
-    formato_pesos,
-    calcular_precio_venta,
-    obtener_reglas_iniciales
-)
-
+from pricing_engine import formato_pesos, calcular_precio_venta, obtener_reglas_iniciales
 from proveedor_loader import obtener_productos_proveedor
 
 # =========================
 # CONFIG
 # =========================
-st.set_page_config(
-    page_title="Valentín Pet Food",
-    page_icon="🐾",
-    layout="wide"
-)
+st.set_page_config(page_title="Valentín Pet Food", page_icon="🐾", layout="wide")
 
 # =========================
-# ESTILOS MOBILE-FIRST
+# CSS MOBILE FIRST
 # =========================
 st.markdown("""
 <style>
-    .stApp {
-        background: linear-gradient(180deg, #0F172A 0%, #020617 100%);
-        color: #F8FAFC;
-    }
-
-    .main .block-container {
-        max-width: 1100px;
-        padding-top: 0.3rem;
-        padding-bottom: 1.2rem;
-        padding-left: 0.85rem;
-        padding-right: 0.85rem;
-    }
-
-    h1, h2, h3, h4, h5, h6, p, span, label, div {
-        color: #F8FAFC;
-    }
-
-    div[data-testid="stVerticalBlock"] > div {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    /* =========================
-       HEADER
-    ========================= */
-    .header-clean {
-        padding: 0 0 8px 0;
-        margin-bottom: 10px;
-    }
-
-    .logo-wrap {
-        display: flex;
-        justify-content: center;
-        margin-bottom: -32px;
-        margin-top: -4px;
-    }
-
-    .titulo {
-        font-size: 24px;
-        font-weight: 900;
-        line-height: 1.05;
-        margin-top: -12px;
-        margin-bottom: 4px;
-        text-align: left;
-    }
-
-    .subtitulo {
-        font-size: 14px;
-        color: #CBD5E1;
-        margin-top: 0;
-        text-align: left;
-    }
-
-    /* =========================
-       BUSCADOR
-    ========================= */
-    .busqueda-label {
-        font-size: 15px;
-        font-weight: 900;
-        margin-bottom: 6px;
-    }
-
-    .busqueda-ayuda {
-        font-size: 12px;
-        color: #CBD5E1;
-        font-style: italic;
-        font-weight: 500;
-        margin-left: 8px;
-    }
-
-    div.stTextInput > div > div > input {
-        font-size: 15px !important;
-        font-weight: 700 !important;
-        background: #F8FAFC !important;
-        color: #111827 !important;
-        border-radius: 12px !important;
-        min-height: 42px !important;
-        padding-right: 12px !important;
-    }
-
-    /* =========================
-       BOTONES
-    ========================= */
-    div.stButton > button {
-    border-radius: 10px !important;
-    font-weight: 900 !important;
-    min-height: 38px !important;
-    background: #E5E7EB !important;
-    color: #111827 !important;
-    font-size: 13px !important;
-    padding: 0.2rem 0.6rem !important;
-    width: auto !important; /* 🔥 CLAVE */
+.stApp {
+    background: linear-gradient(180deg, #0F172A 0%, #020617 100%);
+    color: #F8FAFC;
 }
 
-    div.stButton > button p,
-    div.stButton > button span,
-    div.stButton > button div {
-        color: #111827 !important;
-    }
-
-    div[data-testid="stLinkButton"] a {
-        border-radius: 12px !important;
-        font-weight: 900 !important;
-        min-height: 44px !important;
-        background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%) !important;
-        color: white !important;
-        text-decoration: none !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        font-size: 14px !important;
-    }
-
-    /* =========================
-       INFO
-    ========================= */
-    .info-banner {
-        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-        border-radius: 14px;
-        padding: 12px 14px;
-        margin-bottom: 16px;
-        font-weight: 800;
-        font-size: 14px;
-    }
-
-    /* =========================
-       HERO
-    ========================= */
-    .hero-title {
-        font-size: 22px;
-        font-weight: 900;
-        line-height: 1.08;
-        margin-bottom: 8px;
-    }
-
-    .hero-text {
-        font-size: 15px;
-        margin-bottom: 16px;
-        color: #E2E8F0;
-    }
-
-    /* =========================
-       BLOQUE INFO
-    ========================= */
-    .info-box-unico {
-        background: rgba(30,41,59,0.58);
-        border-radius: 18px;
-        padding: 16px;
-        margin-bottom: 18px;
-        border: 1px solid rgba(255,255,255,0.04);
-    }
-
-    .info-item-title {
-        font-size: 17px;
-        font-weight: 900;
-        margin-bottom: 4px;
-    }
-
-    .info-item-text {
-        font-size: 13px;
-        color: #CBD5E1;
-        line-height: 1.35;
-    }
-
-    /* =========================
-       PRODUCTOS
-    ========================= */
-    .titulo-productos {
-        font-size: 18px;
-        font-weight: 900;
-        margin-top: 6px;
-        margin-bottom: 8px;
-    }
-
-    .producto-card {
-        padding: 6px 0 6px 0;
-    }
-
-    .producto-nombre {
-        font-size: 17px;
-        font-weight: 900;
-        margin-bottom: 8px;
-        line-height: 1.25;
-    }
-
-    .precio-cliente {
-        font-size: 16px;
-        font-weight: 900;
-        background: linear-gradient(135deg, #86EFAC, #22C55E);
-        padding: 9px 12px;
-        border-radius: 12px;
-        text-align: center;
-        display: inline-block;
-        min-width: 125px;
-        color: #052E16 !important;
-        margin-bottom: 6px;
-    }
-
-    div[data-testid="stNumberInput"] {
-    max-width: 80px !important;
+.main .block-container {
+    padding: 0.6rem 0.8rem;
 }
 
-    div[data-testid="stNumberInput"] input {
-    font-size: 14px !important;
-    font-weight: 900 !important;
-    text-align: center !important;
+.titulo { font-size: 24px; font-weight: 900; }
+.subtitulo { font-size: 14px; color: #CBD5E1; }
+
+.busqueda-label { font-size: 15px; font-weight: 900; }
+.busqueda-ayuda { font-size: 12px; font-style: italic; color: #CBD5E1; }
+
+div.stTextInput input {
     background: #F8FAFC !important;
     color: #111827 !important;
     border-radius: 10px !important;
-    min-height: 38px !important;
+    min-height: 40px !important;
 }
 
-    label {
-        margin-bottom: 1px !important;
-        font-size: 12px !important;
-        font-weight: 800 !important;
-    }
+div.stButton button {
+    background: #E5E7EB !important;
+    color: #111827 !important;
+    border-radius: 10px !important;
+    min-height: 36px !important;
+    font-size: 13px !important;
+    padding: 4px 6px !important;
+}
 
-    hr {
-        border: none;
-        height: 1px;
-        background: rgba(148,163,184,0.16);
-        margin: 6px 0 8px 0;
-    }
+.precio {
+    background: linear-gradient(135deg,#86EFAC,#22C55E);
+    padding: 8px 12px;
+    border-radius: 12px;
+    color:#052E16;
+    font-weight:900;
+    display:inline-block;
+}
 
-    /* =========================
-       DESKTOP
-    ========================= */
-    @media (min-width: 769px) {
-        .main .block-container {
-            padding-top: 0.6rem;
-            padding-left: 1.2rem;
-            padding-right: 1.2rem;
-            padding-bottom: 1.8rem;
-        }
+.producto-card {
+    padding:6px 0;
+}
 
-        .logo-wrap {
-            justify-content: flex-start;
-            margin-bottom: -24px;
-        }
-
-        .titulo {
-            font-size: 34px;
-            margin-top: -10px;
-        }
-
-        .subtitulo {
-            font-size: 18px;
-        }
-
-        .busqueda-label {
-            font-size: 18px;
-        }
-
-        .busqueda-ayuda {
-            font-size: 13px;
-        }
-
-        div.stTextInput > div > div > input {
-            min-height: 48px !important;
-            font-size: 17px !important;
-        }
-
-        div.stButton > button {
-            min-height: 48px !important;
-            font-size: 15px !important;
-        }
-
-        div[data-testid="stNumberInput"] input {
-            min-height: 48px !important;
-            font-size: 17px !important;
-        }
-
-        .info-banner {
-            font-size: 16px;
-        }
-
-        .hero-title {
-            font-size: 40px;
-        }
-
-        .hero-text {
-            font-size: 19px;
-        }
-
-        .info-item-title {
-            font-size: 21px;
-        }
-
-        .info-item-text {
-            font-size: 15px;
-        }
-
-        .titulo-productos {
-            font-size: 28px;
-            margin-bottom: 14px;
-        }
-
-        .producto-nombre {
-            font-size: 22px;
-        }
-
-        .precio-cliente {
-            font-size: 20px;
-            min-width: 160px;
-            padding: 10px 14px;
-        }
-    }
+hr {
+    margin:6px 0;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -347,53 +76,25 @@ if "productos" not in st.session_state:
 if "carrito" not in st.session_state:
     st.session_state["carrito"] = []
 
-if "ver_carrito" not in st.session_state:
-    st.session_state["ver_carrito"] = False
-
 if "buscar_click" not in st.session_state:
     st.session_state["buscar_click"] = False
-
-zona = pytz.timezone("America/Argentina/Buenos_Aires")
 
 # =========================
 # FUNCIONES
 # =========================
-def agregar(producto, precio, cantidad):
-    for item in st.session_state["carrito"]:
-        if item["Producto"] == producto:
-            item["Cantidad"] += cantidad
+def agregar(prod, precio, cant):
+    for i in st.session_state["carrito"]:
+        if i["Producto"] == prod:
+            i["Cantidad"] += cant
             return
-
     st.session_state["carrito"].append({
-        "Producto": producto,
+        "Producto": prod,
         "Precio": precio,
-        "Cantidad": cantidad
+        "Cantidad": cant
     })
 
-def quitar(producto):
-    st.session_state["carrito"] = [
-        x for x in st.session_state["carrito"] if x["Producto"] != producto
-    ]
-
 def total_items():
-    return sum(x["Cantidad"] for x in st.session_state["carrito"])
-
-def mensaje_whatsapp_pedido():
-    lineas = ["Hola, necesito hacer un pedido:", ""]
-    total = 0
-
-    for item in st.session_state["carrito"]:
-        sub = item["Cantidad"] * item["Precio"]
-        total += sub
-        lineas.append(f"- {item['Cantidad']} x {item['Producto']} = {formato_pesos(sub)}")
-
-    lineas.append("")
-    lineas.append(f"TOTAL: {formato_pesos(total)}")
-
-    return urllib.parse.quote("\\n".join(lineas))
-
-def mensaje_whatsapp_consulta():
-    return urllib.parse.quote("Hola, necesito hacerte una consulta.")
+    return sum(i["Cantidad"] for i in st.session_state["carrito"])
 
 # =========================
 # DATOS
@@ -406,244 +107,87 @@ for p in st.session_state["productos"]:
 
 df = pd.DataFrame(st.session_state["productos"])
 
-# =========================
-# DESTACADOS PORTADA
-# =========================
-MARCAS_DESTACADAS = ["old prince", "biopet", "maintenance", "excellent"]
+MARCAS = ["old prince","biopet","maintenance","excellent"]
 
-def es_destacado(nombre):
-    nombre = str(nombre).lower()
-    return any(marca in nombre for marca in MARCAS_DESTACADAS)
+def destacado(x):
+    return any(m in x.lower() for m in MARCAS)
 
-df_destacados = df[df["Producto"].apply(es_destacado)].copy()
-df_destacados = df_destacados.sort_values("Producto")
+df_dest = df[df["Producto"].apply(destacado)]
 
 # =========================
 # HEADER
 # =========================
-st.markdown('<div class="header-clean">', unsafe_allow_html=True)
-
-c1, c2 = st.columns([1.45, 3.55], gap="small")
-
+c1,c2 = st.columns([1,3])
 with c1:
-    st.markdown('<div class="logo-wrap">', unsafe_allow_html=True)
-    st.image("assets/logo.png", width=240)
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    st.image("assets/logo.png", width=200)
 with c2:
     st.markdown('<div class="titulo">Valentín Pet Food</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtitulo">Tu tienda online para perros y gatos</div>', unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
-
 # =========================
-# BUSCADOR MOBILE-FIRST
+# BUSCADOR
 # =========================
 st.markdown(
-    '<div class="busqueda-label">Buscar producto <span class="busqueda-ayuda">escribí el nombre y presioná la lupa</span></div>',
+    '<div class="busqueda-label">Buscar producto <span class="busqueda-ayuda">escribí y tocá la lupa</span></div>',
     unsafe_allow_html=True
 )
 
-# En mobile: barra grande + lupa chica + carrito chico
-b1, b2, b3 = st.columns([4.5, 0.9, 1.4], gap="small")
+b1,b2,b3 = st.columns([4,0.8,1])
 
 with b1:
-    busqueda = st.text_input(
-        "",
-        placeholder="Ej: Old Prince, pipetas...",
-        label_visibility="collapsed"
-    )
+    busqueda = st.text_input("", placeholder="Ej: Dog Chow")
 
 with b2:
-    if st.button("🔎", use_container_width=True):
-        st.session_state["buscar_click"] = True
-        st.markdown(
-            """
-            <script>
-            setTimeout(function() {
-                document.getElementById("resultados").scrollIntoView({behavior: "smooth"});
-            }, 100);
-            </script>
-            """,
-            unsafe_allow_html=True
-        )
+    buscar = st.button("🔎")
 
 with b3:
-    if st.button(f"🛒 {total_items()}", use_container_width=True):
-        st.session_state["ver_carrito"] = True
-        st.rerun()
+    st.button(f"🛒 {total_items()}")
+
+if buscar:
+    st.session_state["buscar_click"] = True
 
 # =========================
-# INFO
+# RESULTADOS
 # =========================
-st.markdown(
-    f'<div class="info-banner">🕒 Última actualización: {datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")}</div>',
-    unsafe_allow_html=True
-)
-
-# =========================
-# HERO
-# =========================
-h1, h2 = st.columns([1, 1.15], gap="medium")
-
-with h1:
-    st.markdown('<div class="hero-title">Todo para perros y gatos</div>', unsafe_allow_html=True)
-    st.markdown('<div class="hero-text">Comprá fácil y rápido por WhatsApp</div>', unsafe_allow_html=True)
-
-    st.link_button(
-        "Consultas por WhatsApp",
-        f"https://wa.me/5491141645510?text={mensaje_whatsapp_consulta()}",
-        use_container_width=True
-    )
-
-with h2:
-    st.image("assets/nuestra_manada.jpeg", use_container_width=True)
-
-# =========================
-# BLOQUE INFO
-# =========================
-st.markdown('<div class="info-box-unico">', unsafe_allow_html=True)
-
-i1, i2, i3 = st.columns(3, gap="small")
-
-with i1:
-    st.markdown("<div class='info-item-title'>🐾 Productos seleccionados</div>", unsafe_allow_html=True)
-    st.markdown("<div class='info-item-text'>Mostramos alimentos destacados para tu mascota.</div>", unsafe_allow_html=True)
-
-with i2:
-    st.markdown("<div class='info-item-title'>📦 Compra simple</div>", unsafe_allow_html=True)
-    st.markdown("<div class='info-item-text'>Elegí, agregá al carrito y enviá tu pedido.</div>", unsafe_allow_html=True)
-
-with i3:
-    st.markdown("<div class='info-item-title'>💬 WhatsApp</div>", unsafe_allow_html=True)
-    st.markdown("<div class='info-item-text'>Atención directa y pedidos rápidos.</div>", unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# =========================
-# FILTRO
-# =========================
-mostrar_busqueda = st.session_state["buscar_click"] and busqueda.strip() != ""
-
-if mostrar_busqueda:
-    df_mostrar = df[df["Producto"].str.contains(busqueda, case=False, na=False)].copy()
-    titulo_productos = "🔎 Resultados de búsqueda"
+if st.session_state["buscar_click"] and busqueda:
+    df_mostrar = df[df["Producto"].str.contains(busqueda, case=False)]
+    st.success(f"Resultados para: {busqueda}")
 else:
-    df_mostrar = df_destacados.copy()
-    titulo_productos = "🐶🐱 Productos destacados"
-
-# =========================
-# CARRITO
-# =========================
-if st.session_state["ver_carrito"]:
-    st.markdown('<div class="titulo-productos">🛒 Mi carrito</div>', unsafe_allow_html=True)
-
-    if not st.session_state["carrito"]:
-        st.info("Todavía no agregaste productos.")
-
-    else:
-        total = 0
-
-        for i, item in enumerate(st.session_state["carrito"]):
-            sub = item["Cantidad"] * item["Precio"]
-            total += sub
-
-            st.markdown('<div class="producto-card">', unsafe_allow_html=True)
-
-            c1, c2 = st.columns([3.5, 1.5], gap="small")
-
-            with c1:
-                st.markdown(f"<div class='producto-nombre'>{item['Producto']}</div>", unsafe_allow_html=True)
-                st.caption(f"Precio unitario: {formato_pesos(item['Precio'])}")
-                st.write(f"Subtotal: **{formato_pesos(sub)}**")
-
-            with c2:
-                cant = st.number_input(
-                    "Cant.",
-                    min_value=1,
-                    value=item["Cantidad"],
-                    key=f"cant{i}"
-                )
-                item["Cantidad"] = cant
-
-                if st.button("❌", key=f"del{i}", use_container_width=True):
-                    quitar(item["Producto"])
-                    st.rerun()
-
-            st.markdown("<hr>", unsafe_allow_html=True)
-
-        st.markdown(f"""
-            <div style="
-                background: linear-gradient(135deg, #14532D 0%, #166534 100%);
-                border-radius: 18px;
-                padding: 18px;
-                text-align: center;
-                margin-top: 14px;
-                margin-bottom: 16px;
-            ">
-                <div style="font-size: 13px; font-weight: 800; color: #DCFCE7;">TOTAL DEL PEDIDO</div>
-                <div style="font-size: 30px; font-weight: 900; color: #F0FDF4;">{formato_pesos(total)}</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        url = f"https://wa.me/5491141645510?text={mensaje_whatsapp_pedido()}"
-        st.link_button("📲 Enviar pedido", url, use_container_width=True)
-
-    cv1, cv2 = st.columns(2, gap="small")
-
-    with cv1:
-        if st.button("⬅️ Volver", use_container_width=True):
-            st.session_state["ver_carrito"] = False
-            st.rerun()
-
-    with cv2:
-        if st.button("🗑 Vaciar", use_container_width=True):
-            st.session_state["carrito"] = []
-            st.rerun()
-
-    st.stop()
+    df_mostrar = df_dest
 
 # =========================
 # PRODUCTOS
 # =========================
-st.markdown(f'<div class="titulo-productos">{titulo_productos}</div>', unsafe_allow_html=True)
-
-for i, row in df_mostrar.iterrows():
+for i,row in df_mostrar.iterrows():
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
-    # Nombre + precio
-    t1, t2 = st.columns([3.2, 1.8], gap="small")
+    st.markdown(f"**{row['Producto']}**")
+    st.markdown(f"<div class='precio'>{formato_pesos(row['Venta'])}</div>", unsafe_allow_html=True)
 
-    with t1:
-        st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
+    key=f"q{i}"
+    if key not in st.session_state:
+        st.session_state[key]=1
 
-    with t2:
-        st.markdown(
-            f"<div class='precio-cliente'>{formato_pesos(row['Venta'])}</div>",
-            unsafe_allow_html=True
-        )
-        
-        st.markdown('<div id="resultados"></div>', unsafe_allow_html=True)
-
-    # Cantidad + botón (lo más compacto posible en Streamlit)
-    c1, c2 = st.columns([1, 2], gap="small")
+    c1,c2,c3 = st.columns([0.7,1.2,2.1])
 
     with c1:
-        cantidad = st.number_input(
-            "Cantidad",
-            min_value=1,
-            max_value=99,
-            value=1,
-            step=1,
-            key=f"prod{i}"
-        )
+        if st.button("➖", key=f"m{i}"):
+            if st.session_state[key]>1:
+                st.session_state[key]-=1
 
     with c2:
-        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-        if st.button("🛒 Agregar", key=f"btn{i}"):
-            agregar(row["Producto"], row["Venta"], cantidad)
-            st.toast("✅ Producto agregado")
-            st.rerun()
+        st.markdown(f"<div style='text-align:center;background:white;color:black;border-radius:8px'>{st.session_state[key]}</div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    with c3:
+        sub1,sub2=st.columns([0.6,2.4])
+
+        with sub1:
+            if st.button("➕", key=f"p{i}"):
+                st.session_state[key]+=1
+
+        with sub2:
+            if st.button("Agregar", key=f"a{i}"):
+                agregar(row["Producto"], row["Venta"], st.session_state[key])
+                st.toast("Agregado")
+
     st.markdown("<hr>", unsafe_allow_html=True)
