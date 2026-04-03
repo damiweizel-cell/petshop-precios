@@ -640,7 +640,7 @@ for i, row in df_mostrar.iterrows():
 
     with c2:
         st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-        if st.button("🛒 Agregar", key=f"btn{i}")
+        if st.button("🛒 Agregar", key=f"btn{i}"):
             agregar(row["Producto"], row["Venta"], cantidad)
             st.toast("✅ Producto agregado")
             st.rerun()
