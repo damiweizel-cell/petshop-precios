@@ -21,7 +21,7 @@ def obtener_margen(peso, reglas_df):
 def calcular_precio_venta(costo, peso, reglas_df):
     margen_regla = obtener_margen(peso, reglas_df)
     venta_base = costo + margen_regla
-    venta_redondeada = redondear_a_1000_superior(venta_base)
+    venta_redondeada = redondear_a_1000_inferior(venta_base)
     ganancia_real = venta_redondeada - costo
     return ganancia_real, venta_redondeada
 
