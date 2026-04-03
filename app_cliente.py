@@ -332,7 +332,7 @@ for p in st.session_state["productos"]:
 
 df = pd.DataFrame(st.session_state["productos"])
 
-MARCAS_DESTACADAS = ["old prince", "biopet", "maintenance", "excellent"]
+MARCAS_DESTACADAS = ["old prince", "biopet"]
 
 def es_destacado(nombre):
     nombre = str(nombre).lower()
