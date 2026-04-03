@@ -116,6 +116,70 @@ st.markdown("""
         }
 
         /* =========================
+   BOTONES - TEXTO VISIBLE
+========================= */
+div.stButton > button {
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 0.55rem 0.9rem;
+    border: none;
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
+}
+
+div.stButton > button p,
+div.stButton > button span,
+div.stButton > button div {
+    color: #0F172A !important;
+}
+
+div.stButton > button:hover {
+    background-color: #E2E8F0 !important;
+    color: #0F172A !important;
+}
+
+div.stButton > button:hover p,
+div.stButton > button:hover span,
+div.stButton > button:hover div {
+    color: #0F172A !important;
+}
+
+/* LINK BUTTON (WhatsApp, etc.) */
+a[data-testid="stLinkButton"] {
+    background-color: #25D366 !important;
+    color: white !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    padding: 0.75rem 1rem !important;
+    text-decoration: none !important;
+}
+
+a[data-testid="stLinkButton"] * {
+    color: white !important;
+}
+
+/* BOTONES DEL HEADER */
+button[kind="secondary"] {
+    color: #0F172A !important;
+}
+
+/* DATA EDITOR / INPUTS / CAMPOS */
+input, textarea {
+    color: #111827 !important;
+}
+
+/* NUMBER INPUT */
+div[data-baseweb="input"] input {
+    color: #111827 !important;
+}
+
+/* BOTONES CHICOS Y TEXTO INTERNO */
+button * {
+    color: inherit !important;
+}
+
+        /* =========================
            REGLAS
         ========================= */
         .bloque-reglas {
