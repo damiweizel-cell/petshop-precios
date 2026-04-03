@@ -30,11 +30,11 @@ st.markdown("""
            FONDO GENERAL
         ========================= */
         .stApp {
-            background: linear-gradient(180deg, #0F172A 0%, #132238 35%, #1E293B 100%);
+            background: linear-gradient(180deg, #E5E7EB 0%, #D1D5DB 45%, #C7CDD4 100%);
         }
 
         .main .block-container {
-            padding-top: 0.5rem;
+            padding-top: 0.8rem;
             padding-bottom: 1rem;
             max-width: 1320px;
         }
@@ -53,8 +53,8 @@ st.markdown("""
 
         .section-title {
             font-size: 30px;
-            font-weight: 800;
-            color: #F8FAFC;
+            font-weight: 900;
+            color: #111827;
             margin-top: 8px;
             margin-bottom: 4px;
             line-height: 1.15;
@@ -63,10 +63,10 @@ st.markdown("""
 
         .section-subtitle {
             font-size: 15px;
-            color: #CBD5E1;
-            font-weight: 500;
+            color: #374151;
+            font-weight: 600;
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         /* =========================
@@ -77,29 +77,47 @@ st.markdown("""
         }
 
         .stInfo {
-            background-color: rgba(191, 219, 254, 0.18) !important;
-            color: #E0F2FE !important;
-            border: 1px solid rgba(147, 197, 253, 0.25) !important;
+            background-color: rgba(59, 130, 246, 0.10) !important;
+            color: #1E3A8A !important;
+            border: 1px solid rgba(59, 130, 246, 0.20) !important;
         }
 
         h1, h2, h3, h4, h5, h6, label, p {
-            color: #F8FAFC;
+            color: #111827;
         }
 
         .stMarkdown, .stText, .stCaption {
-            color: #F8FAFC !important;
+            color: #111827 !important;
         }
 
         /* =========================
-           INPUTS / BOTONES
+           INPUTS
+        ========================= */
+        div.stTextInput > div > div > input {
+            border-radius: 14px;
+            background: #FFFFFF;
+            color: #111827 !important;
+            border: 1px solid #9CA3AF;
+        }
+
+        input, textarea {
+            color: #111827 !important;
+        }
+
+        div[data-baseweb="input"] input {
+            color: #111827 !important;
+        }
+
+        /* =========================
+           BOTONES GENERALES
         ========================= */
         div.stButton > button {
             border-radius: 12px;
             font-weight: 700;
             padding: 0.45rem 0.75rem;
             border: none;
-            background-color: #F8FAFC !important;
-            color: #0F172A !important;
+            background-color: #1F2937 !important;
+            color: #FFFFFF !important;
             width: auto !important;
             min-width: auto !important;
             white-space: nowrap;
@@ -108,21 +126,31 @@ st.markdown("""
         div.stButton > button p,
         div.stButton > button span,
         div.stButton > button div {
-            color: #0F172A !important;
+            color: #FFFFFF !important;
         }
 
         div.stButton > button:hover {
-            background-color: #E2E8F0 !important;
-            color: #0F172A !important;
+            background-color: #374151 !important;
+            color: #FFFFFF !important;
         }
 
         div.stButton > button:hover p,
         div.stButton > button:hover span,
         div.stButton > button:hover div {
-            color: #0F172A !important;
+            color: #FFFFFF !important;
         }
 
-        /* LINK BUTTON (WhatsApp, etc.) */
+        button[kind="secondary"] {
+            color: #FFFFFF !important;
+        }
+
+        button * {
+            color: inherit !important;
+        }
+
+        /* =========================
+           LINK BUTTON (WHATSAPP)
+        ========================= */
         a[data-testid="stLinkButton"] {
             background-color: #25D366 !important;
             color: white !important;
@@ -135,46 +163,31 @@ st.markdown("""
             width: auto !important;
             min-width: auto !important;
             white-space: nowrap !important;
+            border: none !important;
         }
 
         a[data-testid="stLinkButton"] * {
             color: white !important;
         }
 
-        button[kind="secondary"] {
-            color: #0F172A !important;
-        }
-
-        input, textarea {
-            color: #111827 !important;
-        }
-
-        div[data-baseweb="input"] input {
-            color: #111827 !important;
-        }
-
-        button * {
-            color: inherit !important;
-        }
-
         /* =========================
            REGLAS
         ========================= */
         .bloque-reglas {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.65);
             border-radius: 18px;
             padding: 18px;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(0,0,0,0.06);
             margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         /* =========================
            CARRITO
         ========================= */
         .carrito-item {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.75);
+            border: 1px solid rgba(0,0,0,0.06);
             border-radius: 14px;
             padding: 14px;
             margin-bottom: 10px;
@@ -207,7 +220,7 @@ st.markdown("""
         ========================= */
         @media (max-width: 768px) {
             .main .block-container {
-                padding-top: 0.3rem;
+                padding-top: 0.4rem;
                 padding-bottom: 1rem;
                 padding-left: 0.8rem;
                 padding-right: 0.8rem;
@@ -324,14 +337,9 @@ for p in productos:
 df = pd.DataFrame(productos)
 
 # =========================
-# HEADER
+# HEADER (SIN LOGO)
 # =========================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
-
-try:
-    st.image("assets/logo.png", use_container_width=True)
-except:
-    st.write("🐾")
 
 st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
 st.markdown('<div class="section-subtitle">Sistema de precios automático</div>', unsafe_allow_html=True)
@@ -401,7 +409,7 @@ if not busqueda:
 # =========================
 if st.session_state["ver_carrito"]:
     st.markdown(
-        "<h2 style='color:#FFFFFF; margin-bottom: 12px;'>🛒 Carrito</h2>",
+        "<h2 style='color:#111827; margin-bottom: 12px;'>🛒 Carrito</h2>",
         unsafe_allow_html=True
     )
 
@@ -479,7 +487,7 @@ if st.session_state["ver_carrito"]:
 # CATÁLOGO MOBILE BIEN RESUELTO
 # =========================
 st.markdown(
-    "<h2 style='color:#FFFFFF; margin-bottom: 12px;'>📦 Productos</h2>",
+    "<h2 style='color:#111827; margin-bottom: 12px;'>📦 Productos</h2>",
     unsafe_allow_html=True
 )
 
@@ -491,7 +499,7 @@ for i, row in df.iterrows():
         <div style="
             font-size:17px;
             font-weight:800;
-            color:#FFFFFF;
+            color:#111827;
             margin-bottom:2px;
             line-height:1.25;
         ">
@@ -506,7 +514,7 @@ for i, row in df.iterrows():
         f"""
         <div style="
             font-size:13px;
-            color:#CBD5E1;
+            color:#374151;
             margin-bottom:8px;
         ">
             {formato_pesos(row['Costo'])} · {formato_pesos(row['Ganancia'])}
@@ -554,7 +562,7 @@ for i, row in df.iterrows():
         """
         <hr style="
             border:0;
-            border-top:1px solid rgba(255,255,255,0.12);
+            border-top:1px solid rgba(17,24,39,0.10);
             margin:8px 0 14px 0;
         ">
         """,
