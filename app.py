@@ -580,63 +580,79 @@ if st.session_state["ver_carrito"]:
     st.stop()
 
 # =========================
-# CATÁLOGO
+# CATÁLOGO MOBILE BIEN RESUELTO
 # =========================
 st.header("📦 Productos")
 
-# Encabezado tipo lista / planilla
-col1, col2, col3, col4, col5 = st.columns([5.5, 1.5, 1.5, 1.8, 1.4])
-
-with col1:
-    st.markdown("<div class='col-header'>Descripción</div>", unsafe_allow_html=True)
-with col2:
-    st.markdown("<div class='col-header'>Costo</div>", unsafe_allow_html=True)
-with col3:
-    st.markdown("<div class='col-header'>Ganancia</div>", unsafe_allow_html=True)
-with col4:
-    st.markdown("<div class='col-header'>Venta</div>", unsafe_allow_html=True)
-with col5:
-    st.markdown("<div class='col-header'>Acción</div>", unsafe_allow_html=True)
-
-st.markdown('<hr class="linea-producto">', unsafe_allow_html=True)
-
 for i, row in df.iterrows():
-    st.markdown('<div class="producto-row">', unsafe_allow_html=True)
 
-    col1, col2, col3, col4, col5 = st.columns([5.5, 1.5, 1.5, 1.8, 1.4])
+    # Nombre del producto
+    st.markdown(
+        f"""
+        <div style="
+            font-size:17px;
+            font-weight:800;
+            color:#F8FAFC;
+            margin-bottom:2px;
+            line-height:1.25;
+        ">
+            {row['Producto']}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Costo + Ganancia en misma línea
+    st.markdown(
+        f"""
+        <div style="
+            font-size:13px;
+            color:#CBD5E1;
+            margin-bottom:8px;
+        ">
+            {formato_pesos(row['Costo'])} · {formato_pesos(row['Ganancia'])}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Precio + botón en misma fila
+    col1, col2 = st.columns([1.2, 1])
 
     with col1:
         st.markdown(
-            f"<div class='producto-nombre'>{row['Producto']}</div>",
-            unsafe_allow_html=True
-        )
-        st.markdown(
-            f"<div class='dato-secundario'>{row['Peso']} kg</div>",
+            f"""
+            <div style="
+                font-size:18px;
+                font-weight:900;
+                color:#166534;
+                background:#DCFCE7;
+                padding:10px 14px;
+                border-radius:12px;
+                display:inline-block;
+                min-width:110px;
+                text-align:center;
+                margin-bottom:8px;
+            ">
+                {formato_pesos(row['Venta'])}
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
     with col2:
-        st.markdown(
-            f"<div class='dato-secundario'><strong>{formato_pesos(row['Costo'])}</strong></div>",
-            unsafe_allow_html=True
-        )
-
-    with col3:
-        st.markdown(
-            f"<div class='dato-secundario'><strong>{formato_pesos(row['Ganancia'])}</strong></div>",
-            unsafe_allow_html=True
-        )
-
-    with col4:
-        st.markdown(
-            f"<div class='venta-destacada'>{formato_pesos(row['Venta'])}</div>",
-            unsafe_allow_html=True
-        )
-
-    with col5:
-        if st.button("Agregar", key=i):
+        if st.button("Agregar", key=i, use_container_width=True):
             agregar_al_carrito(row["Producto"], row["Venta"])
             st.toast("Agregado al carrito")
 
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown('<hr class="linea-producto">', unsafe_allow_html=True)
+    # Línea separadora
+    st.markdown(
+        """
+        <hr style="
+            border:0;
+            border-top:1px solid rgba(255,255,255,0.12);
+            margin:8px 0 14px 0;
+        ">
+        """,
+        unsafe_allow_html=True
+    )
