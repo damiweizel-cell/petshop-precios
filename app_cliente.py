@@ -483,17 +483,20 @@ st.markdown(f"## {titulo_productos}")
 for i, row in df_mostrar.iterrows():
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
-    t1, t2 = st.columns([4,2])
+    # nombre + precio
+    t1, t2 = st.columns([3.2, 1.8])
 
     with t1:
         st.markdown(f"<div class='producto-nombre'>{row['Producto']}</div>", unsafe_allow_html=True)
 
     with t2:
-        st.markdown(f"<div class='precio-cliente'>{formato_pesos(row['Venta'])}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='precio-cliente'>{formato_pesos(row['Venta'])}</div>",
+            unsafe_allow_html=True
+        )
 
-    # IMPORTANTE: en mobile Streamlit puede apilar columnas sí o sí.
-    # Este reparto minimiza ese problema y lo deja mucho mejor.
-    c1, c2 = st.columns([1.2, 2.8], vertical_alignment="bottom")
+    # cantidad + botón
+    c1, c2 = st.columns([1.25, 2.75], gap="small")
 
     with c1:
         cantidad = st.number_input(
@@ -506,6 +509,7 @@ for i, row in df_mostrar.iterrows():
         )
 
     with c2:
+        st.markdown("<div style='height: 23px;'></div>", unsafe_allow_html=True)
         if st.button("Agregar al carrito", key=f"btn{i}", use_container_width=True):
             agregar(row["Producto"], row["Venta"], cantidad)
             st.toast("✅ Producto agregado")
