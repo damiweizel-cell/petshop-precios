@@ -34,7 +34,7 @@ st.markdown("""
         }
 
         .main .block-container {
-            padding-top: 1rem;
+            padding-top: 0.5rem;
             padding-bottom: 1rem;
             max-width: 1320px;
         }
@@ -83,12 +83,11 @@ st.markdown("""
         }
 
         h1, h2, h3, h4, h5, h6, label, p {
-        color: #F8FAFC;
+            color: #F8FAFC;
         }
 
-        /* Texto general */
         .stMarkdown, .stText, .stCaption {
-        color: #F8FAFC !important;
+            color: #F8FAFC !important;
         }
 
         /* =========================
@@ -97,87 +96,66 @@ st.markdown("""
         div.stButton > button {
             border-radius: 12px;
             font-weight: 700;
-            padding: 0.55rem 0.9rem;
+            padding: 0.45rem 0.75rem;
             border: none;
-            background-color: #F8FAFC;
-            color: #0F172A;
+            background-color: #F8FAFC !important;
+            color: #0F172A !important;
+            width: auto !important;
+            min-width: auto !important;
+            white-space: nowrap;
+        }
+
+        div.stButton > button p,
+        div.stButton > button span,
+        div.stButton > button div {
+            color: #0F172A !important;
         }
 
         div.stButton > button:hover {
-            background-color: #E2E8F0;
-            color: #0F172A;
+            background-color: #E2E8F0 !important;
+            color: #0F172A !important;
         }
 
-        div.stTextInput > div > div > input {
-            border-radius: 14px;
-            background: #F8FAFC;
+        div.stButton > button:hover p,
+        div.stButton > button:hover span,
+        div.stButton > button:hover div {
+            color: #0F172A !important;
+        }
+
+        /* LINK BUTTON (WhatsApp, etc.) */
+        a[data-testid="stLinkButton"] {
+            background-color: #25D366 !important;
+            color: white !important;
+            border-radius: 12px !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            padding: 0.55rem 0.8rem !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+            width: auto !important;
+            min-width: auto !important;
+            white-space: nowrap !important;
+        }
+
+        a[data-testid="stLinkButton"] * {
+            color: white !important;
+        }
+
+        button[kind="secondary"] {
+            color: #0F172A !important;
+        }
+
+        input, textarea {
             color: #111827 !important;
-            border: 1px solid #CBD5E1;
         }
 
-        /* =========================
-   BOTONES - TEXTO VISIBLE
-========================= */
-div.stButton > button {
-    border-radius: 12px;
-    font-weight: 700;
-    padding: 0.55rem 0.9rem;
-    border: none;
-    background-color: #F8FAFC !important;
-    color: #0F172A !important;
-}
+        div[data-baseweb="input"] input {
+            color: #111827 !important;
+        }
 
-div.stButton > button p,
-div.stButton > button span,
-div.stButton > button div {
-    color: #0F172A !important;
-}
-
-div.stButton > button:hover {
-    background-color: #E2E8F0 !important;
-    color: #0F172A !important;
-}
-
-div.stButton > button:hover p,
-div.stButton > button:hover span,
-div.stButton > button:hover div {
-    color: #0F172A !important;
-}
-
-/* LINK BUTTON (WhatsApp, etc.) */
-a[data-testid="stLinkButton"] {
-    background-color: #25D366 !important;
-    color: white !important;
-    border-radius: 12px !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-    padding: 0.75rem 1rem !important;
-    text-decoration: none !important;
-}
-
-a[data-testid="stLinkButton"] * {
-    color: white !important;
-}
-
-/* BOTONES DEL HEADER */
-button[kind="secondary"] {
-    color: #0F172A !important;
-}
-
-/* DATA EDITOR / INPUTS / CAMPOS */
-input, textarea {
-    color: #111827 !important;
-}
-
-/* NUMBER INPUT */
-div[data-baseweb="input"] input {
-    color: #111827 !important;
-}
-
-/* BOTONES CHICOS Y TEXTO INTERNO */
-button * {
-    color: inherit !important;
-}
+        button * {
+            color: inherit !important;
+        }
 
         /* =========================
            REGLAS
@@ -225,87 +203,11 @@ button * {
         }
 
         /* =========================
-           PRODUCTOS TIPO LISTA
-        ========================= */
-        .producto-row {
-    padding: 6px 0;
-    display: flex;
-    align-items: center;
-}
-
-.producto-nombre {
-    font-size: 16px;
-    font-weight: 800;
-    color: #F8FAFC;
-    line-height: 1.2;
-    margin-bottom: 2px;
-}
-
-.dato-secundario {
-    font-size: 13px;
-    color: #CBD5E1;
-    font-weight: 600;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.venta-destacada {
-    font-size: 17px;
-    font-weight: 900;
-    color: #166534;
-    background-color: #DCFCE7;
-    padding: 8px 12px;
-    border-radius: 12px;
-    text-align: center;
-    display: inline-block;
-    min-width: 95px;
-    box-shadow: 0 4px 10px rgba(34,197,94,0.18);
-    white-space: nowrap;
-}
-
-.linea-producto {
-    border: none;
-    border-top: 1px solid rgba(255,255,255,0.12);
-    margin: 4px 0 6px 0;
-}
-
-/* Encabezados mini tipo planilla */
-.col-header {
-    font-size: 12px;
-    font-weight: 700;
-    color: #93C5FD;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-bottom: 8px;
-}
-
-/* Responsive celular */
-@media (max-width: 768px) {
-    .producto-nombre {
-        font-size: 14px;
-    }
-
-    .dato-secundario {
-        font-size: 12px;
-    }
-
-    .venta-destacada {
-        font-size: 15px;
-        min-width: 88px;
-        padding: 7px 10px;
-    }
-
-    .col-header {
-        font-size: 11px;
-    }
-}
-
-        /* =========================
            RESPONSIVE CELULAR
         ========================= */
         @media (max-width: 768px) {
             .main .block-container {
-                padding-top: 0.5rem;
+                padding-top: 0.3rem;
                 padding-bottom: 1rem;
                 padding-left: 0.8rem;
                 padding-right: 0.8rem;
@@ -317,20 +219,6 @@ button * {
 
             .section-subtitle {
                 font-size: 13px;
-            }
-
-            .producto-nombre {
-                font-size: 16px;
-            }
-
-            .dato-secundario {
-                font-size: 12px;
-            }
-
-            .venta-destacada {
-                font-size: 16px;
-                min-width: 95px;
-                padding: 8px 12px;
             }
         }
     </style>
@@ -405,6 +293,11 @@ def generar_mensaje_whatsapp(items):
     lineas.append(f"TOTAL DEL PEDIDO: {formato_pesos(total)}")
 
     return "\n".join(lineas)
+
+
+def generar_mensaje_producto(producto, venta):
+    mensaje = f"🐾 1 uni de {producto}\n💲 Precio: {formato_pesos(venta)}"
+    return urllib.parse.quote(mensaje)
 
 # =========================
 # CARGA DE PRODUCTOS
@@ -507,7 +400,10 @@ if not busqueda:
 # CARRITO
 # =========================
 if st.session_state["ver_carrito"]:
-    st.header("🛒 Carrito")
+    st.markdown(
+        "<h2 style='color:#FFFFFF; margin-bottom: 12px;'>🛒 Carrito</h2>",
+        unsafe_allow_html=True
+    )
 
     if not st.session_state["seleccionados"]:
         st.info("El carrito está vacío.")
@@ -563,7 +459,7 @@ if st.session_state["ver_carrito"]:
         mensaje_codificado = urllib.parse.quote(mensaje)
         whatsapp_url = f"https://wa.me/?text={mensaje_codificado}"
 
-        st.link_button("📲 Enviar mensaje por WhatsApp", whatsapp_url, use_container_width=True)
+        st.link_button("📲 Enviar pedido por WhatsApp", whatsapp_url, use_container_width=True)
 
     colv1, colv2 = st.columns(2)
 
@@ -582,7 +478,10 @@ if st.session_state["ver_carrito"]:
 # =========================
 # CATÁLOGO MOBILE BIEN RESUELTO
 # =========================
-st.header("📦 Productos")
+st.markdown(
+    "<h2 style='color:#FFFFFF; margin-bottom: 12px;'>📦 Productos</h2>",
+    unsafe_allow_html=True
+)
 
 for i, row in df.iterrows():
 
@@ -592,7 +491,7 @@ for i, row in df.iterrows():
         <div style="
             font-size:17px;
             font-weight:800;
-            color:#F8FAFC;
+            color:#FFFFFF;
             margin-bottom:2px;
             line-height:1.25;
         ">
@@ -616,8 +515,8 @@ for i, row in df.iterrows():
         unsafe_allow_html=True
     )
 
-    # Precio + botón en misma fila
-    col1, col2 = st.columns([1.2, 1])
+    # Precio + botones
+    col1, col2, col3 = st.columns([1.2, 0.9, 0.9])
 
     with col1:
         st.markdown(
@@ -641,9 +540,14 @@ for i, row in df.iterrows():
         )
 
     with col2:
-        if st.button("Agregar", key=i, use_container_width=True):
+        if st.button("Agregar", key=f"add_{i}"):
             agregar_al_carrito(row["Producto"], row["Venta"])
             st.toast("Agregado al carrito")
+
+    with col3:
+        mensaje_producto = generar_mensaje_producto(row["Producto"], row["Venta"])
+        whatsapp_url_producto = f"https://wa.me/?text={mensaje_producto}"
+        st.link_button("Enviar", whatsapp_url_producto)
 
     # Línea separadora
     st.markdown(
