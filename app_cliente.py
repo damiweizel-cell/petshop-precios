@@ -491,7 +491,7 @@ with hero1:
 with hero2:
     st.markdown('<div class="hero-img-box">', unsafe_allow_html=True)
     st.image(
-        "assets/nuestra_manada.png",
+        "assets/nuestra_manada.jpeg",
         use_container_width=True
     )
     st.markdown('</div>', unsafe_allow_html=True)
