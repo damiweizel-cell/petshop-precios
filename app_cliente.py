@@ -13,56 +13,29 @@ from proveedor_loader import obtener_productos_proveedor
 st.set_page_config(page_title="Valentín Pet Food", page_icon="🐾", layout="wide")
 
 # =========================
-# CSS MOBILE FIRST
+# CSS
 # =========================
 st.markdown("""
 <style>
-.stApp {
-    background: linear-gradient(180deg, #0F172A 0%, #020617 100%);
-    color: #F8FAFC;
-}
+.stApp {background: linear-gradient(180deg,#0F172A,#020617); color:white;}
 
-.main .block-container {
-    padding: 0.6rem 0.8rem;
-}
-
-.titulo { font-size: 24px; font-weight: 900; }
-.subtitulo { font-size: 14px; color: #CBD5E1; }
-
-.busqueda-label { font-size: 15px; font-weight: 900; }
-.busqueda-ayuda { font-size: 12px; font-style: italic; color: #CBD5E1; }
-
-div.stTextInput input {
-    background: #F8FAFC !important;
-    color: #111827 !important;
-    border-radius: 10px !important;
-    min-height: 40px !important;
-}
-
-div.stButton button {
-    background: #E5E7EB !important;
-    color: #111827 !important;
-    border-radius: 10px !important;
-    min-height: 36px !important;
-    font-size: 13px !important;
-    padding: 4px 6px !important;
-}
+.titulo {font-size:26px;font-weight:900;}
+.subtitulo {font-size:14px;color:#CBD5E1;}
 
 .precio {
-    background: linear-gradient(135deg,#86EFAC,#22C55E);
-    padding: 8px 12px;
-    border-radius: 12px;
-    color:#052E16;
-    font-weight:900;
-    display:inline-block;
+ background:linear-gradient(135deg,#86EFAC,#22C55E);
+ padding:8px 12px;border-radius:12px;
+ color:#052E16;font-weight:900;
+ display:inline-block;
 }
 
-.producto-card {
-    padding:6px 0;
-}
+.producto-card {padding:6px 0;}
+hr {margin:6px 0;}
 
-hr {
-    margin:6px 0;
+div.stButton button {
+ border-radius:10px;
+ min-height:36px;
+ font-size:13px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -76,8 +49,8 @@ if "productos" not in st.session_state:
 if "carrito" not in st.session_state:
     st.session_state["carrito"] = []
 
-if "buscar_click" not in st.session_state:
-    st.session_state["buscar_click"] = False
+if "ver_carrito" not in st.session_state:
+    st.session_state["ver_carrito"] = False
 
 # =========================
 # FUNCIONES
@@ -96,6 +69,16 @@ def agregar(prod, precio, cant):
 def total_items():
     return sum(i["Cantidad"] for i in st.session_state["carrito"])
 
+def mensaje():
+    total=0
+    txt="Hola, quiero hacer este pedido:%0A"
+    for i in st.session_state["carrito"]:
+        sub=i["Cantidad"]*i["Precio"]
+        total+=sub
+        txt+=f"- {i['Cantidad']} x {i['Producto']} = {formato_pesos(sub)}%0A"
+    txt+=f"%0ATOTAL: {formato_pesos(total)}"
+    return txt
+
 # =========================
 # DATOS
 # =========================
@@ -108,11 +91,7 @@ for p in st.session_state["productos"]:
 df = pd.DataFrame(st.session_state["productos"])
 
 MARCAS = ["old prince","biopet","maintenance","excellent"]
-
-def destacado(x):
-    return any(m in x.lower() for m in MARCAS)
-
-df_dest = df[df["Producto"].apply(destacado)]
+df_dest = df[df["Producto"].str.lower().str.contains("|".join(MARCAS))]
 
 # =========================
 # HEADER
@@ -125,40 +104,72 @@ with c2:
     st.markdown('<div class="subtitulo">Tu tienda online para perros y gatos</div>', unsafe_allow_html=True)
 
 # =========================
-# BUSCADOR
+# BUSCADOR + CARRITO
 # =========================
-st.markdown(
-    '<div class="busqueda-label">Buscar producto <span class="busqueda-ayuda">escribí y tocá la lupa</span></div>',
-    unsafe_allow_html=True
-)
-
-b1,b2,b3 = st.columns([4,0.8,1])
+b1,b2,b3 = st.columns([4,1,1])
 
 with b1:
-    busqueda = st.text_input("", placeholder="Ej: Dog Chow")
+    busqueda = st.text_input("", placeholder="Buscar producto...")
 
 with b2:
     buscar = st.button("🔎")
 
 with b3:
-    st.button(f"🛒 {total_items()}")
-
-if buscar:
-    st.session_state["buscar_click"] = True
+    if st.button(f"🛒 {total_items()}"):
+        st.session_state["ver_carrito"] = True
+        st.rerun()
 
 # =========================
-# RESULTADOS
+# HERO (IMAGEN RESTAURADA)
 # =========================
-if st.session_state["buscar_click"] and busqueda:
+st.image("assets/nuestra_manada.jpeg", use_container_width=True)
+
+# =========================
+# CONSULTA WHATSAPP
+# =========================
+st.link_button(
+    "Consultar por WhatsApp",
+    "https://wa.me/5491141645510?text=Hola, quiero hacer una consulta"
+)
+
+# =========================
+# FILTRO
+# =========================
+if buscar and busqueda:
     df_mostrar = df[df["Producto"].str.contains(busqueda, case=False)]
     st.success(f"Resultados para: {busqueda}")
 else:
     df_mostrar = df_dest
 
 # =========================
+# CARRITO
+# =========================
+if st.session_state["ver_carrito"]:
+    st.title("🛒 Carrito")
+
+    total=0
+
+    for i,item in enumerate(st.session_state["carrito"]):
+        sub=item["Cantidad"]*item["Precio"]
+        total+=sub
+        st.write(f"{item['Cantidad']} x {item['Producto']} = {formato_pesos(sub)}")
+
+    st.markdown(f"### Total: {formato_pesos(total)}")
+
+    url=f"https://wa.me/5491141645510?text={mensaje()}"
+    st.link_button("Enviar pedido", url)
+
+    if st.button("Volver"):
+        st.session_state["ver_carrito"]=False
+        st.rerun()
+
+    st.stop()
+
+# =========================
 # PRODUCTOS
 # =========================
 for i,row in df_mostrar.iterrows():
+
     st.markdown('<div class="producto-card">', unsafe_allow_html=True)
 
     st.markdown(f"**{row['Producto']}**")
@@ -188,6 +199,5 @@ for i,row in df_mostrar.iterrows():
         with sub2:
             if st.button("Agregar", key=f"a{i}"):
                 agregar(row["Producto"], row["Venta"], st.session_state[key])
-                st.toast("Agregado")
 
     st.markdown("<hr>", unsafe_allow_html=True)
