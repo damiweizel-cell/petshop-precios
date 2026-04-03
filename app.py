@@ -82,8 +82,13 @@ st.markdown("""
             border: 1px solid rgba(147, 197, 253, 0.25) !important;
         }
 
-        h1, h2, h3, h4, h5, h6, label, p, span, div {
-            color: #F8FAFC;
+        h1, h2, h3, h4, h5, h6, label, p {
+        color: #F8FAFC;
+        }
+
+        /* Texto general */
+        .stMarkdown, .stText, .stCaption {
+        color: #F8FAFC !important;
         }
 
         /* =========================
