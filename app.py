@@ -22,6 +22,13 @@ st.set_page_config(
 )
 
 # =========================
+# CACHE DE PRODUCTOS (mejora rendimiento)
+# =========================
+@st.cache_data(ttl=60)
+def cargar_productos():
+    return obtener_productos_proveedor()
+
+# =========================
 # ESTILOS VISUALES
 # =========================
 st.markdown("""
@@ -313,7 +320,7 @@ def generar_mensaje_producto(producto, venta):
     return urllib.parse.quote(mensaje)
 
 # =========================
-# HEADER (SIN LOGO)
+# HEADER
 # =========================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
@@ -337,7 +344,6 @@ with col2:
 
 with col3:
     if st.button("Actualizar"):
-        # Guardar precios anteriores antes de refrescar
         precios_previos = {}
         for p in st.session_state["productos_cacheados"]:
             if "Producto" in p and "Venta" in p:
@@ -345,12 +351,12 @@ with col3:
 
         st.session_state["precios_anteriores"] = precios_previos
 
-        # Cargar nuevos productos del proveedor
-        productos = obtener_productos_proveedor()
+        # Limpia cache y vuelve a consultar proveedor
+        cargar_productos.clear()
+        productos = cargar_productos()
 
         productos_aumentados = []
 
-        # Calcular precios y detectar aumentos
         for p in productos:
             ganancia, venta = calcular_precio_venta(
                 p["Costo"],
@@ -408,10 +414,17 @@ if st.session_state["mostrar_reglas"]:
 # =========================
 # DATAFRAME A MOSTRAR
 # =========================
-if st.session_state["hubo_aumento"] and len(st.session_state["productos_aumentados"]) > 0:
+if st.session_state["ultima_actualizacion"] is None:
+    df = pd.DataFrame()  # No muestra nada al entrar
+
+elif st.session_state["hubo_aumento"]:
     df = pd.DataFrame(st.session_state["productos_aumentados"])
+
 else:
     df = pd.DataFrame(st.session_state["productos_cacheados"])
+
+    if not df.empty and "Producto" in df.columns:
+        df = df[df["Producto"].str.upper().str.contains("OLD PRINCE", na=False)]
 
 # =========================
 # FILTRO
@@ -421,6 +434,7 @@ if not df.empty and busqueda:
 
 if not df.empty:
     df = df.sort_values("Producto")
+    df = df.head(30)  # mejora rendimiento
 
 # =========================
 # CARRITO
@@ -468,7 +482,7 @@ if st.session_state["ver_carrito"]:
             with col4:
                 st.write("")
                 st.write("")
-                if st.button("❌", key=f"del_{idx}"):
+                if st.button("❌", key=f"del_{item['Producto']}"):
                     quitar_del_carrito(item["Producto"])
                     st.rerun()
 
@@ -541,7 +555,7 @@ st.markdown(
 )
 
 if df.empty:
-    st.info("Todavía no cargaste productos. Presioná el botón 'Actualizar'.")
+    st.info("Todavía no hay productos para mostrar. Presioná 'Actualizar'.")
 
 else:
     for i, row in df.iterrows():
@@ -606,7 +620,7 @@ else:
             )
 
         with col2:
-            if st.button("Agregar", key=f"add_{i}"):
+            if st.button("Agregar", key=f"add_{row['Producto']}"):
                 agregar_al_carrito(row["Producto"], row["Venta"])
                 st.toast("Agregado al carrito")
 
