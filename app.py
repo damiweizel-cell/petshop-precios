@@ -261,12 +261,9 @@ st.markdown("""
 
             .section-subtitle {
                 font-size: 14px;
-            }
+            }    
         }
-    </style>
-""", unsafe_allow_html=True)
-
-/* =========================
+        /* =========================
    NUMBER INPUT CARRITO
 ========================= */
 div[data-baseweb="input"] input[type="number"] {
@@ -279,6 +276,21 @@ div[data-baseweb="input"] input {
     color: #FFFFFF !important;
     caret-color: #FFFFFF !important;
 }
+
+/* =========================
+   TOAST / MENSAJE FLOTANTE
+========================= */
+[data-testid="stToast"] {
+    background-color: #1F2937 !important;
+    color: #FFFFFF !important;
+    border-radius: 12px !important;
+}
+
+[data-testid="stToast"] * {
+    color: #FFFFFF !important;
+}
+    </style>
+""", unsafe_allow_html=True)
 
 # =========================
 # ZONA HORARIA
