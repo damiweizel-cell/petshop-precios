@@ -5,6 +5,7 @@ import pytz
 import urllib.parse
 import json
 import os
+import io
 
 from pricing_engine import (
     formato_pesos,
@@ -384,6 +385,50 @@ def generar_mensaje_producto(producto, venta):
     mensaje = f"1 uni de {producto}\nPrecio unitario: {formato_pesos(venta)}"
     return urllib.parse.quote(mensaje)
 
+def exportar_productos_excel(productos):
+    if not productos:
+        return None
+
+    df_export = pd.DataFrame(productos).copy()
+
+    # Ordenar columnas si existen
+    columnas_deseadas = ["Producto", "Costo", "Ganancia", "Venta", "Aumento"]
+    columnas_presentes = [c for c in columnas_deseadas if c in df_export.columns]
+    df_export = df_export[columnas_presentes]
+
+    # Renombrar columnas para exportación
+    df_export = df_export.rename(columns={
+        "Producto": "Producto",
+        "Costo": "Precio Costo",
+        "Ganancia": "Margen / Ganancia",
+        "Venta": "Precio Venta",
+        "Aumento": "Aumentó"
+    })
+
+    output = io.BytesIO()
+
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df_export.to_excel(writer, index=False, sheet_name="Productos")
+
+        ws = writer.sheets["Productos"]
+
+        # Ajustar ancho de columnas
+        for col in ws.columns:
+            max_length = 0
+            col_letter = col[0].column_letter
+
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+
+            ws.column_dimensions[col_letter].width = max_length + 3
+
+    output.seek(0)
+    return output
+
 # =========================
 # HEADER
 # =========================
@@ -398,7 +443,7 @@ if st.session_state["ultima_actualizacion"]:
 # =========================
 # BUSCADOR + ACCIONES
 # =========================
-col1, col2, col3, col4 = st.columns([3.2, 1, 1, 1])
+col1, col2, col3, col4, col5 = st.columns([3.2, 1, 1, 1, 1.2])
 
 with col1:
     busqueda = st.text_input("Buscar producto")
@@ -460,6 +505,17 @@ with col4:
     if st.button(f"Carrito ({len(st.session_state['seleccionados'])})"):
         st.session_state["ver_carrito"] = True
         st.rerun()
+
+with col5:
+    archivo_excel = exportar_productos_excel(st.session_state["productos_cacheados"])
+
+    if archivo_excel:
+        st.download_button(
+            label="📥 Exportar",
+            data=archivo_excel,
+            file_name="listado_productos_valentin_pet_food.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
 # =========================
 # ALERTA DE AUMENTOS
