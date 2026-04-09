@@ -5,7 +5,6 @@ import pytz
 import urllib.parse
 import json
 import os
-import io
 
 from pricing_engine import (
     formato_pesos,
@@ -385,7 +384,7 @@ def generar_mensaje_producto(producto, venta):
     mensaje = f"1 uni de {producto}\nPrecio unitario: {formato_pesos(venta)}"
     return urllib.parse.quote(mensaje)
 
-def exportar_productos_excel(productos):
+def exportar_productos_csv(productos):
     if not productos:
         return None
 
@@ -405,7 +404,7 @@ def exportar_productos_excel(productos):
         "Aumento": "Aumentó"
     })
 
-    output = io.BytesIO()
+    return df_export.to_csv(index=False).encode("utf-8-sig")
 
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df_export.to_excel(writer, index=False, sheet_name="Productos")
@@ -507,14 +506,14 @@ with col4:
         st.rerun()
 
 with col5:
-    archivo_excel = exportar_productos_excel(st.session_state["productos_cacheados"])
+    archivo_csv = exportar_productos_csv(st.session_state["productos_cacheados"])
 
-    if archivo_excel:
+    if archivo_csv:
         st.download_button(
             label="📥 Exportar",
-            data=archivo_excel,
-            file_name="listado_productos_valentin_pet_food.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            data=archivo_csv,
+            file_name="listado_productos_valentin_pet_food.csv",
+            mime="text/csv"
         )
 
 # =========================
