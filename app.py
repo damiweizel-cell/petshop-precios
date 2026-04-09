@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime
 import pytz
 import urllib.parse
+import json
+import os
 
 from pricing_engine import (
     formato_pesos,
@@ -20,6 +22,34 @@ st.set_page_config(
     page_icon="🐾",
     layout="wide"
 )
+
+# =========================
+# ARCHIVO DE PERSISTENCIA
+# =========================
+ARCHIVO_ESTADO = "estado_app.json"
+
+def guardar_estado():
+    estado = {
+        "productos_cacheados": st.session_state.get("productos_cacheados", []),
+        "precios_anteriores": st.session_state.get("precios_anteriores", {}),
+        "ultima_actualizacion": st.session_state.get("ultima_actualizacion"),
+        "productos_aumentados": st.session_state.get("productos_aumentados", []),
+        "hubo_aumento": st.session_state.get("hubo_aumento", False),
+        "productos_mostrados": st.session_state.get("productos_mostrados", []),
+        "reglas": st.session_state.get("reglas").to_dict(orient="records")
+        if isinstance(st.session_state.get("reglas"), pd.DataFrame)
+        else []
+    }
+
+    with open(ARCHIVO_ESTADO, "w", encoding="utf-8") as f:
+        json.dump(estado, f, ensure_ascii=False, indent=2)
+
+
+def cargar_estado():
+    if os.path.exists(ARCHIVO_ESTADO):
+        with open(ARCHIVO_ESTADO, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
 
 # =========================
 # CACHE DE PRODUCTOS
@@ -244,20 +274,35 @@ zona = pytz.timezone("America/Argentina/Buenos_Aires")
 # =========================
 # SESSION STATE
 # =========================
+if "estado_cargado" not in st.session_state:
+    estado_guardado = cargar_estado()
+
+    if estado_guardado:
+        st.session_state["productos_cacheados"] = estado_guardado.get("productos_cacheados", [])
+        st.session_state["precios_anteriores"] = estado_guardado.get("precios_anteriores", {})
+        st.session_state["ultima_actualizacion"] = estado_guardado.get("ultima_actualizacion")
+        st.session_state["productos_aumentados"] = estado_guardado.get("productos_aumentados", [])
+        st.session_state["hubo_aumento"] = estado_guardado.get("hubo_aumento", False)
+        st.session_state["productos_mostrados"] = estado_guardado.get("productos_mostrados", [])
+
+        reglas_guardadas = estado_guardado.get("reglas", [])
+        if reglas_guardadas:
+            st.session_state["reglas"] = pd.DataFrame(reglas_guardadas)
+        else:
+            st.session_state["reglas"] = obtener_reglas_iniciales()
+    else:
+        st.session_state["productos_cacheados"] = []
+        st.session_state["precios_anteriores"] = {}
+        st.session_state["ultima_actualizacion"] = None
+        st.session_state["productos_aumentados"] = []
+        st.session_state["hubo_aumento"] = False
+        st.session_state["productos_mostrados"] = []
+        st.session_state["reglas"] = obtener_reglas_iniciales()
+
+    st.session_state["estado_cargado"] = True
+
 if "logueado" not in st.session_state:
     st.session_state["logueado"] = True
-
-if "productos_cacheados" not in st.session_state:
-    st.session_state["productos_cacheados"] = []
-
-if "precios_anteriores" not in st.session_state:
-    st.session_state["precios_anteriores"] = {}
-
-if "ultima_actualizacion" not in st.session_state:
-    st.session_state["ultima_actualizacion"] = None
-
-if "reglas" not in st.session_state:
-    st.session_state["reglas"] = obtener_reglas_iniciales()
 
 if "seleccionados" not in st.session_state:
     st.session_state["seleccionados"] = []
@@ -267,15 +312,6 @@ if "ver_carrito" not in st.session_state:
 
 if "mostrar_reglas" not in st.session_state:
     st.session_state["mostrar_reglas"] = False
-
-if "productos_aumentados" not in st.session_state:
-    st.session_state["productos_aumentados"] = []
-
-if "hubo_aumento" not in st.session_state:
-    st.session_state["hubo_aumento"] = False
-
-if "productos_mostrados" not in st.session_state:
-    st.session_state["productos_mostrados"] = []
 
 # =========================
 # FUNCIONES CARRITO
@@ -347,7 +383,6 @@ with col2:
 
 with col3:
     if st.button("Actualizar"):
-        # Guardar precios anteriores antes de refrescar
         precios_previos = {}
         for p in st.session_state["productos_cacheados"]:
             if "Producto" in p and "Venta" in p:
@@ -355,13 +390,11 @@ with col3:
 
         st.session_state["precios_anteriores"] = precios_previos
 
-        # Limpiar cache y consultar proveedor
         cargar_productos.clear()
         productos = cargar_productos()
 
         productos_aumentados = []
 
-        # Calcular precios y detectar aumentos
         for p in productos:
             ganancia, venta = calcular_precio_venta(
                 p["Costo"],
@@ -385,7 +418,6 @@ with col3:
         st.session_state["hubo_aumento"] = len(productos_aumentados) > 0
         st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
 
-        # 🔥 Guardar exactamente lo que debe seguir viéndose hasta el próximo actualizar
         if len(productos_aumentados) > 0:
             st.session_state["productos_mostrados"] = productos_aumentados
         else:
@@ -395,6 +427,7 @@ with col3:
             ]
             st.session_state["productos_mostrados"] = productos_old_prince
 
+        guardar_estado()
         st.rerun()
 
 with col4:
@@ -423,6 +456,7 @@ if st.session_state["mostrar_reglas"]:
 
     if st.button("Guardar reglas"):
         st.session_state["reglas"] = reglas_editadas.copy()
+        guardar_estado()
         st.success("Reglas guardadas correctamente")
 
     st.markdown('</div>', unsafe_allow_html=True)
@@ -443,7 +477,7 @@ if not df.empty and busqueda:
 
 if not df.empty:
     df = df.sort_values("Producto")
-    df = df.head(30)  # mejora rendimiento
+    df = df.head(30)
 
 # =========================
 # CARRITO
@@ -574,7 +608,6 @@ else:
         else:
             nombre_html = row['Producto']
 
-        # Nombre del producto
         st.markdown(
             f"""
             <div style="
@@ -590,7 +623,6 @@ else:
             unsafe_allow_html=True
         )
 
-        # Costo + Ganancia en misma línea
         st.markdown(
             f"""
             <div style="
@@ -604,7 +636,6 @@ else:
             unsafe_allow_html=True
         )
 
-        # Precio + botones
         col1, col2, col3 = st.columns([1.2, 0.9, 0.9])
 
         with col1:
@@ -648,7 +679,6 @@ else:
                 unsafe_allow_html=True
             )
 
-        # Línea separadora
         st.markdown(
             """
             <hr style="
