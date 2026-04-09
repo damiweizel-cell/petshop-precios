@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # =========================
-# CACHE DE PRODUCTOS (mejora rendimiento)
+# CACHE DE PRODUCTOS
 # =========================
 @st.cache_data(ttl=60)
 def cargar_productos():
@@ -274,6 +274,9 @@ if "productos_aumentados" not in st.session_state:
 if "hubo_aumento" not in st.session_state:
     st.session_state["hubo_aumento"] = False
 
+if "productos_mostrados" not in st.session_state:
+    st.session_state["productos_mostrados"] = []
+
 # =========================
 # FUNCIONES CARRITO
 # =========================
@@ -344,6 +347,7 @@ with col2:
 
 with col3:
     if st.button("Actualizar"):
+        # Guardar precios anteriores antes de refrescar
         precios_previos = {}
         for p in st.session_state["productos_cacheados"]:
             if "Producto" in p and "Venta" in p:
@@ -351,12 +355,13 @@ with col3:
 
         st.session_state["precios_anteriores"] = precios_previos
 
-        # Limpia cache y vuelve a consultar proveedor
+        # Limpiar cache y consultar proveedor
         cargar_productos.clear()
         productos = cargar_productos()
 
         productos_aumentados = []
 
+        # Calcular precios y detectar aumentos
         for p in productos:
             ganancia, venta = calcular_precio_venta(
                 p["Costo"],
@@ -379,6 +384,17 @@ with col3:
         st.session_state["productos_aumentados"] = productos_aumentados
         st.session_state["hubo_aumento"] = len(productos_aumentados) > 0
         st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
+
+        # 🔥 Guardar exactamente lo que debe seguir viéndose hasta el próximo actualizar
+        if len(productos_aumentados) > 0:
+            st.session_state["productos_mostrados"] = productos_aumentados
+        else:
+            productos_old_prince = [
+                p for p in productos
+                if "OLD PRINCE" in str(p["Producto"]).upper()
+            ]
+            st.session_state["productos_mostrados"] = productos_old_prince
+
         st.rerun()
 
 with col4:
@@ -414,17 +430,10 @@ if st.session_state["mostrar_reglas"]:
 # =========================
 # DATAFRAME A MOSTRAR
 # =========================
-if st.session_state["ultima_actualizacion"] is None:
-    df = pd.DataFrame()  # No muestra nada al entrar
-
-elif st.session_state["hubo_aumento"]:
-    df = pd.DataFrame(st.session_state["productos_aumentados"])
-
+if st.session_state["productos_mostrados"]:
+    df = pd.DataFrame(st.session_state["productos_mostrados"])
 else:
-    df = pd.DataFrame(st.session_state["productos_cacheados"])
-
-    if not df.empty and "Producto" in df.columns:
-        df = df[df["Producto"].str.upper().str.contains("OLD PRINCE", na=False)]
+    df = pd.DataFrame()
 
 # =========================
 # FILTRO
