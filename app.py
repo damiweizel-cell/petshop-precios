@@ -266,6 +266,20 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+/* =========================
+   NUMBER INPUT CARRITO
+========================= */
+div[data-baseweb="input"] input[type="number"] {
+    color: #FFFFFF !important;
+    background-color: #1F2937 !important;
+    caret-color: #FFFFFF !important;
+}
+
+div[data-baseweb="input"] input {
+    color: #FFFFFF !important;
+    caret-color: #FFFFFF !important;
+}
+
 # =========================
 # ZONA HORARIA
 # =========================
