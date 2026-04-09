@@ -390,12 +390,10 @@ def exportar_productos_csv(productos):
 
     df_export = pd.DataFrame(productos).copy()
 
-    # Ordenar columnas si existen
     columnas_deseadas = ["Producto", "Costo", "Ganancia", "Venta", "Aumento"]
     columnas_presentes = [c for c in columnas_deseadas if c in df_export.columns]
     df_export = df_export[columnas_presentes]
 
-    # Renombrar columnas para exportación
     df_export = df_export.rename(columns={
         "Producto": "Producto",
         "Costo": "Precio Costo",
@@ -404,7 +402,11 @@ def exportar_productos_csv(productos):
         "Aumento": "Aumentó"
     })
 
-    return df_export.to_csv(index=False).encode("utf-8-sig")
+    return df_export.to_csv(
+        index=False,
+        sep=";",                 # 🔥 CLAVE
+        encoding="utf-8-sig"     # 🔥 para Excel (acentos bien)
+    ).encode("utf-8-sig")
 
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df_export.to_excel(writer, index=False, sheet_name="Productos")
