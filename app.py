@@ -547,11 +547,28 @@ if st.session_state["mostrar_reglas"]:
 # =========================
 # DATAFRAME A MOSTRAR
 # =========================
-if st.session_state["productos_mostrados"]:
-    df = pd.DataFrame(st.session_state["productos_mostrados"])
+# 🔍 Si hay búsqueda → usar TODO el catálogo
+if busqueda and busqueda.strip() != "":
+    df = pd.DataFrame(st.session_state["productos_cacheados"])
 else:
-    df = pd.DataFrame()
+    # 📊 Comportamiento normal (como ya venía funcionando)
+    if st.session_state["productos_mostrados"]:
+        df = pd.DataFrame(st.session_state["productos_mostrados"])
+    else:
+        df = pd.DataFrame()
 
+# =========================
+# FILTRO
+# =========================
+if not df.empty and busqueda:
+    df = df[df["Producto"].str.contains(busqueda, case=False, na=False)]
+
+# =========================
+# ORDEN Y LIMITE
+# =========================
+if not df.empty:
+    df = df.sort_values("Producto")
+    df = df.head(30)
 # =========================
 # FILTRO
 # =========================
