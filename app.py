@@ -289,6 +289,13 @@ div[data-baseweb="input"] input {
 [data-testid="stToast"] * {
     color: #FFFFFF !important;
 }
+
+/* =========================
+   BOTÓN EXPORTAR (DOWNLOAD)
+========================= */
+div[data-testid="stDownloadButton"] button {
+    color: #000000 !important;  /* 🔥 TEXTO NEGRO */
+}
     </style>
 """, unsafe_allow_html=True)
 
