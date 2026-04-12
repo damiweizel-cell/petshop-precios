@@ -38,9 +38,7 @@ def guardar_estado():
         "productos_mostrados": st.session_state.get("productos_mostrados", []),
         "reglas": st.session_state.get("reglas").to_dict(orient="records")
         if isinstance(st.session_state.get("reglas"), pd.DataFrame)
-        else [],
-        # 🔥 NUEVO
-        "historial_aumentos": st.session_state.get("historial_aumentos", [])
+        else []
     }
 
     with open(ARCHIVO_ESTADO, "w", encoding="utf-8") as f:
@@ -61,23 +59,194 @@ def cargar_productos():
     return obtener_productos_proveedor()
 
 # =========================
-# 🔥 NUEVO SESSION STATE
-# =========================
-if "historial_aumentos" not in st.session_state:
-    st.session_state["historial_aumentos"] = []
-
-if "ver_historial" not in st.session_state:
-    st.session_state["ver_historial"] = False
-
-# =========================
 # ESTILOS VISUALES
 # =========================
 st.markdown("""
-<style>
-button[data-testid="baseButton-secondary"] {
-    color: #111827 !important;
-}
-</style>
+    <style>
+        .stApp {
+            background: linear-gradient(180deg, #E5E7EB 0%, #D1D5DB 45%, #C7CDD4 100%);
+        }
+
+        .main .block-container {
+            padding-top: 0.8rem;
+            padding-bottom: 1rem;
+            max-width: 1320px;
+        }
+
+        .header-card {
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 18px;
+            border: none;
+            box-shadow: none;
+        }
+
+        .section-title {
+            font-size: 42px;
+            font-weight: 900;
+            color: #111827;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: #374151;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .stAlert {
+            border-radius: 14px !important;
+        }
+
+        .stInfo {
+            background-color: rgba(59, 130, 246, 0.10) !important;
+            color: #1E3A8A !important;
+            border: 1px solid rgba(59, 130, 246, 0.20) !important;
+        }
+
+        h1, h2, h3, h4, h5, h6, label, p {
+            color: #111827;
+        }
+
+        .stMarkdown, .stText, .stCaption {
+            color: #111827 !important;
+        }
+
+        div.stTextInput > div > div > input {
+            border-radius: 14px;
+            background: #FFFFFF;
+            color: #111827 !important;
+            border: 1px solid #9CA3AF;
+        }
+
+        input, textarea {
+            color: #111827 !important;
+        }
+
+        div[data-baseweb="input"] input {
+            color: #111827 !important;
+        }
+
+        div.stButton > button {
+            border-radius: 12px;
+            font-weight: 700;
+            padding: 0.45rem 0.75rem;
+            border: none;
+            background-color: #1F2937 !important;
+            color: #FFFFFF !important;
+            width: auto !important;
+            min-width: auto !important;
+            white-space: nowrap;
+        }
+
+        div.stButton > button p,
+        div.stButton > button span,
+        div.stButton > button div {
+            color: #FFFFFF !important;
+        }
+
+        div.stButton > button:hover {
+            background-color: #374151 !important;
+            color: #FFFFFF !important;
+        }
+
+        div.stButton > button:hover p,
+        div.stButton > button:hover span,
+        div.stButton > button:hover div {
+            color: #FFFFFF !important;
+        }
+
+        button[kind="secondary"] {
+            color: #FFFFFF !important;
+        }
+
+        button * {
+            color: inherit !important;
+        }
+
+        a.boton-enviar-fijo,
+        a.boton-enviar-fijo:visited,
+        a.boton-enviar-fijo:hover,
+        a.boton-enviar-fijo:active {
+            background: #25D366 !important;
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            padding: 8px 14px !important;
+            border-radius: 10px !important;
+            display: inline-block !important;
+            text-align: center !important;
+            min-width: 72px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.10) !important;
+        }
+
+        .bloque-reglas {
+            background: rgba(255,255,255,0.65);
+            border-radius: 18px;
+            padding: 18px;
+            border: 1px solid rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .carrito-item {
+            background: rgba(255,255,255,0.75);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .carrito-total {
+            background: #DCFCE7;
+            border: 2px solid #22C55E;
+            border-radius: 18px;
+            padding: 18px;
+            text-align: center;
+            margin-top: 18px;
+            margin-bottom: 18px;
+        }
+
+        .carrito-total-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #166534;
+        }
+
+        .carrito-total-value {
+            font-size: 34px;
+            font-weight: 900;
+            color: #14532D;
+        }
+
+        .bloque-aumento {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+
+        .titulo-aumento {
+            color: #B91C1C;
+            font-weight: 900;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .texto-aumento {
+            color: #7F1D1D;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
 # =========================
@@ -86,7 +255,7 @@ button[data-testid="baseButton-secondary"] {
 zona = pytz.timezone("America/Argentina/Buenos_Aires")
 
 # =========================
-# SESSION STATE ORIGINAL
+# SESSION STATE
 # =========================
 if "estado_cargado" not in st.session_state:
     estado_guardado = cargar_estado()
@@ -98,7 +267,6 @@ if "estado_cargado" not in st.session_state:
         st.session_state["productos_aumentados"] = estado_guardado.get("productos_aumentados", [])
         st.session_state["hubo_aumento"] = estado_guardado.get("hubo_aumento", False)
         st.session_state["productos_mostrados"] = estado_guardado.get("productos_mostrados", [])
-        st.session_state["historial_aumentos"] = estado_guardado.get("historial_aumentos", [])
 
         reglas_guardadas = estado_guardado.get("reglas", [])
         if reglas_guardadas:
@@ -112,126 +280,6 @@ if "estado_cargado" not in st.session_state:
         st.session_state["productos_aumentados"] = []
         st.session_state["hubo_aumento"] = False
         st.session_state["productos_mostrados"] = []
-        st.session_state["historial_aumentos"] = []
         st.session_state["reglas"] = obtener_reglas_iniciales()
 
     st.session_state["estado_cargado"] = True
-
-# =========================
-# HEADER
-# =========================
-st.title("Valentín Pet Food")
-
-if st.session_state["ultima_actualizacion"]:
-    st.info(f"🕒 Última actualización: {st.session_state['ultima_actualizacion']}")
-
-# =========================
-# ACTUALIZAR
-# =========================
-if st.button("Actualizar"):
-
-    precios_previos = {}
-    for p in st.session_state["productos_cacheados"]:
-        if "Producto" in p and "Venta" in p:
-            precios_previos[p["Producto"]] = p["Venta"]
-
-    st.session_state["precios_anteriores"] = precios_previos
-
-    cargar_productos.clear()
-    productos = cargar_productos()
-
-    productos_aumentados = []
-
-    for p in productos:
-        ganancia, venta = calcular_precio_venta(
-            p["Costo"],
-            p["Peso"],
-            st.session_state["reglas"]
-        )
-
-        p["Ganancia"] = ganancia
-        p["Venta"] = venta
-
-        precio_anterior = st.session_state["precios_anteriores"].get(p["Producto"], None)
-
-        if precio_anterior is not None and venta > precio_anterior:
-            p["Aumento"] = True
-            productos_aumentados.append(p)
-
-            # 🔥 NUEVO HISTORIAL
-            porcentaje = ((venta - precio_anterior) / precio_anterior) * 100 if precio_anterior > 0 else 0
-
-            st.session_state["historial_aumentos"].append({
-                "fecha": datetime.now(zona).strftime("%d/%m/%Y"),
-                "producto": p["Producto"],
-                "anterior": precio_anterior,
-                "nuevo": venta,
-                "porcentaje": round(porcentaje, 2)
-            })
-
-        else:
-            p["Aumento"] = False
-
-    # 🔥 FILTRO ÚLTIMOS 5 DÍAS
-    fechas_validas = sorted(
-        list(set([h["fecha"] for h in st.session_state["historial_aumentos"]])),
-        reverse=True
-    )[:5]
-
-    st.session_state["historial_aumentos"] = [
-        h for h in st.session_state["historial_aumentos"]
-        if h["fecha"] in fechas_validas
-    ]
-
-    st.session_state["productos_cacheados"] = productos
-    st.session_state["productos_aumentados"] = productos_aumentados
-    st.session_state["hubo_aumento"] = len(productos_aumentados) > 0
-    st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
-
-    guardar_estado()
-    st.rerun()
-
-# =========================
-# ALERTA + BOTÓN HISTORIAL
-# =========================
-if st.session_state["hubo_aumento"]:
-    st.warning("⚠️ Hubo aumentos")
-
-    if st.button("📊 Ver historial de aumentos"):
-        st.session_state["ver_historial"] = True
-        st.rerun()
-
-# =========================
-# HISTORIAL
-# =========================
-if st.session_state["ver_historial"]:
-
-    st.subheader("📊 Historial de aumentos (últimos 5 días)")
-
-    historial = st.session_state["historial_aumentos"]
-
-    if not historial:
-        st.info("No hay aumentos registrados.")
-    else:
-        df_hist = pd.DataFrame(historial).sort_values(
-            by=["fecha", "producto"],
-            ascending=[False, True]
-        )
-
-        st.dataframe(df_hist, use_container_width=True)
-
-    if st.button("⬅️ Volver al catálogo"):
-        st.session_state["ver_historial"] = False
-        st.rerun()
-
-    st.stop()
-
-# =========================
-# LISTADO
-# =========================
-df = pd.DataFrame(st.session_state["productos_cacheados"])
-
-if df.empty:
-    st.info("Presioná actualizar para ver productos")
-else:
-    st.dataframe(df, use_container_width=True)
