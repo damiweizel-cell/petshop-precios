@@ -524,7 +524,7 @@ with col3:
              })
 
         else:
-        p["Aumento"] = False
+            p["Aumento"] = False
 
         st.session_state["productos_cacheados"] = productos
         st.session_state["productos_aumentados"] = productos_aumentados
