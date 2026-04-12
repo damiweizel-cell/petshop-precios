@@ -14,18 +14,12 @@ from pricing_engine import (
 
 from proveedor_loader import obtener_productos_proveedor
 
-# =========================
-# CONFIGURACIÓN DE PÁGINA
-# =========================
 st.set_page_config(
     page_title="Valentín Pet Food",
     page_icon="🐾",
     layout="wide"
 )
 
-# =========================
-# ARCHIVO DE PERSISTENCIA
-# =========================
 ARCHIVO_ESTADO = "estado_app.json"
 
 def guardar_estado():
@@ -36,7 +30,7 @@ def guardar_estado():
         "productos_aumentados": st.session_state.get("productos_aumentados", []),
         "hubo_aumento": st.session_state.get("hubo_aumento", False),
         "productos_mostrados": st.session_state.get("productos_mostrados", []),
-        "historial_aumentos": st.session_state.get("historial_aumentos", []),  # 🔴 NUEVO
+        "historial_aumentos": st.session_state.get("historial_aumentos", []),
         "reglas": st.session_state.get("reglas").to_dict(orient="records")
         if isinstance(st.session_state.get("reglas"), pd.DataFrame)
         else []
@@ -52,21 +46,12 @@ def cargar_estado():
             return json.load(f)
     return None
 
-# =========================
-# CACHE DE PRODUCTOS
-# =========================
 @st.cache_data(ttl=60)
 def cargar_productos():
     return obtener_productos_proveedor()
 
-# =========================
-# ZONA HORARIA
-# =========================
 zona = pytz.timezone("America/Argentina/Buenos_Aires")
 
-# =========================
-# SESSION STATE
-# =========================
 if "estado_cargado" not in st.session_state:
     estado_guardado = cargar_estado()
 
@@ -77,7 +62,7 @@ if "estado_cargado" not in st.session_state:
         st.session_state["productos_aumentados"] = estado_guardado.get("productos_aumentados", [])
         st.session_state["hubo_aumento"] = estado_guardado.get("hubo_aumento", False)
         st.session_state["productos_mostrados"] = estado_guardado.get("productos_mostrados", [])
-        st.session_state["historial_aumentos"] = estado_guardado.get("historial_aumentos", [])  # 🔴 NUEVO
+        st.session_state["historial_aumentos"] = estado_guardado.get("historial_aumentos", [])
 
         reglas_guardadas = estado_guardado.get("reglas", [])
         if reglas_guardadas:
@@ -91,12 +76,11 @@ if "estado_cargado" not in st.session_state:
         st.session_state["productos_aumentados"] = []
         st.session_state["hubo_aumento"] = False
         st.session_state["productos_mostrados"] = []
-        st.session_state["historial_aumentos"] = []  # 🔴 NUEVO
+        st.session_state["historial_aumentos"] = []
         st.session_state["reglas"] = obtener_reglas_iniciales()
 
     st.session_state["estado_cargado"] = True
 
-# 🔴 NUEVOS FLAGS
 if "historial_aumentos" not in st.session_state:
     st.session_state["historial_aumentos"] = []
 
@@ -115,17 +99,11 @@ if "ver_carrito" not in st.session_state:
 if "mostrar_reglas" not in st.session_state:
     st.session_state["mostrar_reglas"] = False
 
-# =========================
-# HEADER
-# =========================
-st.title("🐾 Valentín Pet Food")
+st.markdown("## Valentín Pet Food")
 
 if st.session_state["ultima_actualizacion"]:
     st.info(f"Última actualización: {st.session_state['ultima_actualizacion']}")
 
-# =========================
-# BOTONES
-# =========================
 col1, col2 = st.columns(2)
 
 with col1:
@@ -182,16 +160,12 @@ with col1:
 
 with col2:
     if st.session_state["hubo_aumento"]:
-        if st.button("📈 Ver aumentos"):
+        if st.button("Ver aumentos"):
             st.session_state["ver_aumentos"] = True
             st.rerun()
 
-# =========================
-# HISTORIAL DE AUMENTOS
-# =========================
 if st.session_state["ver_aumentos"]:
-
-    st.subheader("📈 Historial de aumentos")
+    st.subheader("Historial de aumentos")
 
     historial = st.session_state["historial_aumentos"]
 
@@ -214,26 +188,13 @@ if st.session_state["ver_aumentos"]:
             "Variacion"
         ]])
 
-    colA, colB = st.columns(2)
-
-    with colA:
-        if st.button("⬅️ Volver"):
-            st.session_state["ver_aumentos"] = False
-            st.rerun()
-
-    with colB:
-        if st.button("🗑 Limpiar historial"):
-            st.session_state["historial_aumentos"] = []
-            guardar_estado()
-            st.success("Historial eliminado")
-            st.rerun()
+    if st.button("Volver"):
+        st.session_state["ver_aumentos"] = False
+        st.rerun()
 
     st.stop()
 
-# =========================
-# PRODUCTOS
-# =========================
-st.subheader("📦 Productos")
+st.subheader("Productos")
 
 df = pd.DataFrame(st.session_state["productos_cacheados"])
 
