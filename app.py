@@ -497,6 +497,7 @@ with col3:
         productos_aumentados = []
 
         for p in productos:
+            p["Aumento"] = False
             ganancia, venta = calcular_precio_venta(
                 p["Costo"],
                 p["Peso"],
