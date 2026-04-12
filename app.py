@@ -14,12 +14,18 @@ from pricing_engine import (
 
 from proveedor_loader import obtener_productos_proveedor
 
+# =========================
+# CONFIGURACIÓN DE PÁGINA
+# =========================
 st.set_page_config(
     page_title="Valentín Pet Food",
     page_icon="🐾",
     layout="wide"
 )
 
+# =========================
+# ARCHIVO DE PERSISTENCIA
+# =========================
 ARCHIVO_ESTADO = "estado_app.json"
 
 def guardar_estado():
@@ -30,7 +36,7 @@ def guardar_estado():
         "productos_aumentados": st.session_state.get("productos_aumentados", []),
         "hubo_aumento": st.session_state.get("hubo_aumento", False),
         "productos_mostrados": st.session_state.get("productos_mostrados", []),
-        "historial_aumentos": st.session_state.get("historial_aumentos", []),
+        "historial_aumentos": st.session_state.get("historial_aumentos", []),  # 🔴 NUEVO
         "reglas": st.session_state.get("reglas").to_dict(orient="records")
         if isinstance(st.session_state.get("reglas"), pd.DataFrame)
         else []
@@ -46,12 +52,21 @@ def cargar_estado():
             return json.load(f)
     return None
 
+# =========================
+# CACHE DE PRODUCTOS
+# =========================
 @st.cache_data(ttl=60)
 def cargar_productos():
     return obtener_productos_proveedor()
 
+# =========================
+# ZONA HORARIA
+# =========================
 zona = pytz.timezone("America/Argentina/Buenos_Aires")
 
+# =========================
+# SESSION STATE
+# =========================
 if "estado_cargado" not in st.session_state:
     estado_guardado = cargar_estado()
 
@@ -81,29 +96,27 @@ if "estado_cargado" not in st.session_state:
 
     st.session_state["estado_cargado"] = True
 
+# 🔴 NUEVO
 if "historial_aumentos" not in st.session_state:
     st.session_state["historial_aumentos"] = []
 
 if "ver_aumentos" not in st.session_state:
     st.session_state["ver_aumentos"] = False
 
-if "logueado" not in st.session_state:
-    st.session_state["logueado"] = True
-
-if "seleccionados" not in st.session_state:
-    st.session_state["seleccionados"] = []
-
-if "ver_carrito" not in st.session_state:
-    st.session_state["ver_carrito"] = False
-
-if "mostrar_reglas" not in st.session_state:
-    st.session_state["mostrar_reglas"] = False
-
-st.markdown("## Valentín Pet Food")
+# =========================
+# HEADER (igual que el tuyo)
+# =========================
+st.markdown('<div class="header-card">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Sistema de precios automático</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 if st.session_state["ultima_actualizacion"]:
-    st.info(f"Última actualización: {st.session_state['ultima_actualizacion']}")
+    st.info(f"🕒 Última actualización: {st.session_state['ultima_actualizacion']}")
 
+# =========================
+# BOTONES
+# =========================
 col1, col2 = st.columns(2)
 
 with col1:
@@ -160,12 +173,16 @@ with col1:
 
 with col2:
     if st.session_state["hubo_aumento"]:
-        if st.button("Ver aumentos"):
+        if st.button("📈 Ver aumentos"):
             st.session_state["ver_aumentos"] = True
             st.rerun()
 
+# =========================
+# HISTORIAL
+# =========================
 if st.session_state["ver_aumentos"]:
-    st.subheader("Historial de aumentos")
+
+    st.markdown("## 📈 Historial de aumentos")
 
     historial = st.session_state["historial_aumentos"]
 
@@ -188,25 +205,8 @@ if st.session_state["ver_aumentos"]:
             "Variacion"
         ]])
 
-    if st.button("Volver"):
+    if st.button("⬅️ Volver"):
         st.session_state["ver_aumentos"] = False
         st.rerun()
 
     st.stop()
-
-st.subheader("Productos")
-
-df = pd.DataFrame(st.session_state["productos_cacheados"])
-
-if df.empty:
-    st.info("Presioná actualizar para cargar productos.")
-else:
-    for _, row in df.iterrows():
-        nombre = row["Producto"]
-        if row.get("Aumento"):
-            nombre += " 🔺"
-
-        st.write(f"**{nombre}**")
-        st.write(f"Costo: {formato_pesos(row['Costo'])}")
-        st.write(f"Venta: {formato_pesos(row['Venta'])}")
-        st.write("---")
