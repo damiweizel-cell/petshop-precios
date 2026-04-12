@@ -550,11 +550,6 @@ with col5:
             font-weight: 700;
         }
         
-with col6:
-    if st.button("Historial de aumentos"):
-        st.session_state["ver_historial"] = True
-        st.rerun()
-        
         </style>
         """, unsafe_allow_html=True)
 
@@ -564,6 +559,11 @@ with col6:
             file_name="listado_productos_valentin_pet_food.csv",
             mime="text/csv"
         )
+
+with col6:
+    if st.button("Historial de aumentos"):
+        st.session_state["ver_historial"] = True
+        st.rerun()
 
 # =========================
 # ALERTA DE AUMENTOS
