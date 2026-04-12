@@ -534,13 +534,24 @@ with col5:
     archivo_csv = exportar_productos_csv(st.session_state["productos_cacheados"])
 
     if archivo_csv:
+        st.markdown("""
+        <style>
+        div[data-testid="stDownloadButton"] button {
+            background-color: #E5E7EB !important;
+        }
+        div[data-testid="stDownloadButton"] button span {
+            color: #000000 !important;
+            font-weight: 700;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
         st.download_button(
-    label="📥 Exportar",
-    data=archivo_csv,
-    file_name="listado_productos_valentin_pet_food.csv",
-    mime="text/csv",
-    type="secondary"
-)
+            label="📥 Exportar",
+            data=archivo_csv,
+            file_name="listado_productos_valentin_pet_food.csv",
+            mime="text/csv"
+        )
 
 # =========================
 # ALERTA DE AUMENTOS
