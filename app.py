@@ -509,10 +509,22 @@ with col3:
             precio_anterior = st.session_state["precios_anteriores"].get(p["Producto"], None)
 
             if precio_anterior is not None and venta > precio_anterior:
-                p["Aumento"] = True
-                productos_aumentados.append(p)
-            else:
-                p["Aumento"] = False
+    p["Aumento"] = True
+    productos_aumentados.append(p)
+
+    # 🔥 GUARDAR HISTORIAL
+    porcentaje = ((venta - precio_anterior) / precio_anterior) * 100
+
+    st.session_state["historial_aumentos"].append({
+        "fecha": datetime.now(zona).strftime("%d/%m/%Y %H:%M"),
+        "producto": p["Producto"],
+        "costo_anterior": precio_anterior,
+        "costo_actual": venta,
+        "porcentaje": round(porcentaje, 2)
+    })
+
+else:
+    p["Aumento"] = False
 
         st.session_state["productos_cacheados"] = productos
         st.session_state["productos_aumentados"] = productos_aumentados
