@@ -246,6 +246,49 @@ st.markdown("""
             font-size: 14px;
             font-weight: 600;
         }
+
+        @media (max-width: 768px) {
+            .main .block-container {
+                padding-top: 0.4rem;
+                padding-bottom: 1rem;
+                padding-left: 0.8rem;
+                padding-right: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 34px;
+            }
+
+            .section-subtitle {
+                font-size: 14px;
+            }    
+        }
+        /* =========================
+   NUMBER INPUT CARRITO
+========================= */
+div[data-baseweb="input"] input[type="number"] {
+    color: #FFFFFF !important;
+    background-color: #1F2937 !important;
+    caret-color: #FFFFFF !important;
+}
+
+div[data-baseweb="input"] input {
+    color: #FFFFFF !important;
+    caret-color: #FFFFFF !important;
+}
+
+/* =========================
+   TOAST / MENSAJE FLOTANTE
+========================= */
+[data-testid="stToast"] {
+    background-color: #1F2937 !important;
+    color: #FFFFFF !important;
+    border-radius: 12px !important;
+}
+
+[data-testid="stToast"] * {
+    color: #FFFFFF !important;
+}
     </style>
 """, unsafe_allow_html=True)
 
@@ -361,9 +404,31 @@ def exportar_productos_csv(productos):
 
     return df_export.to_csv(
         index=False,
-        sep=";",
-        encoding="utf-8-sig"
+        sep=";",                 # 🔥 CLAVE
+        encoding="utf-8-sig"     # 🔥 para Excel (acentos bien)
     ).encode("utf-8-sig")
+
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df_export.to_excel(writer, index=False, sheet_name="Productos")
+
+        ws = writer.sheets["Productos"]
+
+        # Ajustar ancho de columnas
+        for col in ws.columns:
+            max_length = 0
+            col_letter = col[0].column_letter
+
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+
+            ws.column_dimensions[col_letter].width = max_length + 3
+
+    output.seek(0)
+    return output
 
 # =========================
 # HEADER
@@ -482,14 +547,28 @@ if st.session_state["mostrar_reglas"]:
 # =========================
 # DATAFRAME A MOSTRAR
 # =========================
+# 🔍 Si hay búsqueda → usar TODO el catálogo
 if busqueda and busqueda.strip() != "":
     df = pd.DataFrame(st.session_state["productos_cacheados"])
 else:
+    # 📊 Comportamiento normal (como ya venía funcionando)
     if st.session_state["productos_mostrados"]:
         df = pd.DataFrame(st.session_state["productos_mostrados"])
     else:
         df = pd.DataFrame()
 
+# =========================
+# FILTRO
+# =========================
+if not df.empty and busqueda:
+    df = df[df["Producto"].str.contains(busqueda, case=False, na=False)]
+
+# =========================
+# ORDEN Y LIMITE
+# =========================
+if not df.empty:
+    df = df.sort_values("Producto")
+    df = df.head(30)
 # =========================
 # FILTRO
 # =========================
@@ -504,16 +583,22 @@ if not df.empty:
 # CARRITO
 # =========================
 if st.session_state["ver_carrito"]:
-    st.markdown("<h2>🛒 Carrito</h2>", unsafe_allow_html=True)
+    st.markdown(
+        "<h2 style='color:#111827; margin-bottom: 12px;'>🛒 Carrito</h2>",
+        unsafe_allow_html=True
+    )
 
     if not st.session_state["seleccionados"]:
         st.info("El carrito está vacío.")
+
     else:
         total_general = 0
 
         for idx, item in enumerate(st.session_state["seleccionados"]):
             subtotal = item["Cantidad"] * item["Venta"]
             total_general += subtotal
+
+            st.markdown('<div class="carrito-item">', unsafe_allow_html=True)
 
             col1, col2, col3, col4 = st.columns([5, 1.2, 1.5, 1])
 
@@ -533,35 +618,174 @@ if st.session_state["ver_carrito"]:
                 item["Cantidad"] = nueva_cantidad
 
             with col3:
+                st.write("")
+                st.write("")
                 st.write(f"**{formato_pesos(subtotal)}**")
 
             with col4:
+                st.write("")
+                st.write("")
                 if st.button("❌", key=f"del_{item['Producto']}"):
                     quitar_del_carrito(item["Producto"])
                     st.rerun()
 
-        st.markdown(f"### TOTAL: {formato_pesos(total_general)}")
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(f"""
+            <div class="carrito-total">
+                <div class="carrito-total-label">TOTAL DEL PEDIDO</div>
+                <div class="carrito-total-value">{formato_pesos(total_general)}</div>
+            </div>
+        """, unsafe_allow_html=True)
 
         mensaje = generar_mensaje_whatsapp(st.session_state["seleccionados"])
         mensaje_codificado = urllib.parse.quote(mensaje)
         whatsapp_url = f"https://wa.me/?text={mensaje_codificado}"
 
-        st.markdown(f"[📲 Enviar pedido por WhatsApp]({whatsapp_url})")
+        st.markdown(
+            f"""
+            <a href="{whatsapp_url}" target="_blank" class="boton-enviar-fijo">
+                📲 Enviar pedido por WhatsApp
+            </a>
+            """,
+            unsafe_allow_html=True
+        )
 
-    if st.button("⬅️ Volver"):
-        st.session_state["ver_carrito"] = False
-        st.rerun()
+    colv1, colv2 = st.columns(2)
+
+    with colv1:
+        if st.button("⬅️ Volver al catálogo", use_container_width=True):
+            st.session_state["ver_carrito"] = False
+            st.rerun()
+
+    with colv2:
+        if st.button("🗑 Vaciar carrito", use_container_width=True):
+            st.session_state["seleccionados"] = []
+            st.rerun()
 
     st.stop()
 
 # =========================
-# PRODUCTOS
+# PRODUCTOS CON AUMENTO
 # =========================
+if not df.empty and "Aumento" in df.columns and st.session_state["hubo_aumento"]:
+    productos_aumento = df[df["Aumento"] == True]
+else:
+    productos_aumento = pd.DataFrame()
+
+if not productos_aumento.empty:
+    st.markdown(
+        "<h2 style='color:#B91C1C; margin-bottom: 10px;'>📈 Productos con aumento</h2>",
+        unsafe_allow_html=True
+    )
+
+    for _, row in productos_aumento.iterrows():
+        st.markdown(f"""
+            <div class="bloque-aumento">
+                <div class="titulo-aumento">{row['Producto']}</div>
+                <div class="texto-aumento">
+                    Nuevo precio: {formato_pesos(row['Venta'])}
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# =========================
+# CATÁLOGO PRINCIPAL
+# =========================
+st.markdown(
+    "<h2 style='color:#111827; margin-bottom: 12px;'>📦 Productos</h2>",
+    unsafe_allow_html=True
+)
+
 if df.empty:
     st.info("Todavía no hay productos para mostrar. Presioná 'Actualizar'.")
+
 else:
-    for _, row in df.iterrows():
-        st.write(f"**{row['Producto']}**")
-        st.write(f"{formato_pesos(row['Venta'])}")
-        if st.button("Agregar", key=row["Producto"]):
-            agregar_al_carrito(row["Producto"], row["Venta"])
+    for i, row in df.iterrows():
+
+        if row.get("Aumento"):
+            nombre_html = f"{row['Producto']} <span style='color:#DC2626; font-weight:900;'>▲ Aumentó</span>"
+        else:
+            nombre_html = row['Producto']
+
+        st.markdown(
+            f"""
+            <div style="
+                font-size:17px;
+                font-weight:800;
+                color:#111827;
+                margin-bottom:2px;
+                line-height:1.25;
+            ">
+                {nombre_html}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            f"""
+            <div style="
+                font-size:13px;
+                color:#374151;
+                margin-bottom:8px;
+            ">
+                {formato_pesos(row['Costo'])} · {formato_pesos(row['Ganancia'])}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        col1, col2, col3 = st.columns([1.2, 0.9, 0.9])
+
+        with col1:
+            st.markdown(
+                f"""
+                <div style="
+                    font-size:18px;
+                    font-weight:900;
+                    color:#166534;
+                    background:#DCFCE7;
+                    padding:10px 14px;
+                    border-radius:12px;
+                    display:inline-block;
+                    min-width:110px;
+                    text-align:center;
+                    margin-bottom:8px;
+                ">
+                    {formato_pesos(row['Venta'])}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        with col2:
+            if st.button("Agregar", key=f"add_{row['Producto']}"):
+                agregar_al_carrito(row["Producto"], row["Venta"])
+                st.toast("Agregado al carrito")
+
+        with col3:
+            mensaje_producto = generar_mensaje_producto(row["Producto"], row["Venta"])
+            whatsapp_url_producto = f"https://wa.me/?text={mensaje_producto}"
+
+            st.markdown(
+                f"""
+                <div style="display:flex; justify-content:center; align-items:center; margin-top:2px;">
+                    <a href="{whatsapp_url_producto}" target="_blank" class="boton-enviar-fijo">
+                        Enviar
+                    </a>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        st.markdown(
+            """
+            <hr style="
+                border:0;
+                border-top:1px solid rgba(17,24,39,0.10);
+                margin:8px 0 14px 0;
+            ">
+            """,
+            unsafe_allow_html=True
+        )
