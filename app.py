@@ -303,6 +303,15 @@ div[data-baseweb="input"] input {
 [data-testid="stToast"] * {
     color: #FFFFFF !important;
 }
+/* =========================
+   FIX DEFINITIVO EXPORTAR
+========================= */
+div[data-testid="stDownloadButton"] button,
+div[data-testid="stDownloadButton"] button *,
+div[data-testid="stDownloadButton"] button span,
+div[data-testid="stDownloadButton"] button p {
+    color: #000000 !important;
+}
     </style>
 """, unsafe_allow_html=True)
 
