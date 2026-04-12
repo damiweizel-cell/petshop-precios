@@ -362,6 +362,12 @@ if "ver_carrito" not in st.session_state:
 if "mostrar_reglas" not in st.session_state:
     st.session_state["mostrar_reglas"] = False
 
+if "ver_historial" not in st.session_state:
+    st.session_state["ver_historial"] = False
+
+if "historial_aumentos" not in st.session_state:
+    st.session_state["historial_aumentos"] = []
+
 # =========================
 # FUNCIONES CARRITO
 # =========================
@@ -467,7 +473,7 @@ if st.session_state["ultima_actualizacion"]:
 # =========================
 # BUSCADOR + ACCIONES
 # =========================
-col1, col2, col3, col4, col5 = st.columns([3.2, 1, 1, 1, 1.2])
+col1, col2, col3, col4, col5, col6 = st.columns([3.2, 1, 1, 1, 1.2, 1.5])
 
 with col1:
     busqueda = st.text_input("Buscar producto")
@@ -543,6 +549,12 @@ with col5:
             color: #000000 !important;
             font-weight: 700;
         }
+        
+with col6:
+    if st.button("Historial de aumentos"):
+        st.session_state["ver_historial"] = True
+        st.rerun()
+        
         </style>
         """, unsafe_allow_html=True)
 
@@ -578,6 +590,42 @@ if st.session_state["mostrar_reglas"]:
         st.success("Reglas guardadas correctamente")
 
     st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================
+# HISTORIAL DE AUMENTOS
+# =========================
+if st.session_state["ver_historial"]:
+
+    st.markdown(
+        "<h2 style='color:#111827;'>📊 Historial de aumentos (últimos 5 días)</h2>",
+        unsafe_allow_html=True
+    )
+
+    historial = st.session_state["historial_aumentos"]
+
+    if not historial:
+        st.info("No hay aumentos registrados.")
+
+    else:
+        df_hist = pd.DataFrame(historial)
+
+        df_hist = df_hist.sort_values("fecha", ascending=True)
+
+        df_hist = df_hist.rename(columns={
+            "fecha": "Fecha",
+            "producto": "Producto",
+            "costo_anterior": "Costo Anterior",
+            "costo_actual": "Nuevo Costo",
+            "porcentaje": "% de Aumento"
+        })
+
+        st.dataframe(df_hist, use_container_width=True)
+
+    if st.button("⬅️ Volver al catálogo", use_container_width=True):
+        st.session_state["ver_historial"] = False
+        st.rerun()
+
+    st.stop()
 
 # =========================
 # DATAFRAME A MOSTRAR
