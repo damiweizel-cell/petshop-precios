@@ -535,11 +535,12 @@ with col5:
 
     if archivo_csv:
         st.download_button(
-            label="📥 Exportar",
-            data=archivo_csv,
-            file_name="listado_productos_valentin_pet_food.csv",
-            mime="text/csv"
-        )
+    label="📥 Exportar",
+    data=archivo_csv,
+    file_name="listado_productos_valentin_pet_food.csv",
+    mime="text/csv",
+    type="secondary"
+)
 
 # =========================
 # ALERTA DE AUMENTOS
