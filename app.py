@@ -283,3 +283,285 @@ if "estado_cargado" not in st.session_state:
         st.session_state["reglas"] = obtener_reglas_iniciales()
 
     st.session_state["estado_cargado"] = True
+
+if "logueado" not in st.session_state:
+    st.session_state["logueado"] = True
+
+if "seleccionados" not in st.session_state:
+    st.session_state["seleccionados"] = []
+
+if "ver_carrito" not in st.session_state:
+    st.session_state["ver_carrito"] = False
+
+if "mostrar_reglas" not in st.session_state:
+    st.session_state["mostrar_reglas"] = False
+
+# =========================
+# FUNCIONES CARRITO
+# =========================
+def agregar_al_carrito(producto, venta):
+    for item in st.session_state["seleccionados"]:
+        if item["Producto"] == producto:
+            item["Cantidad"] += 1
+            return
+
+    st.session_state["seleccionados"].append({
+        "Producto": producto,
+        "Venta": int(venta),
+        "Cantidad": 1
+    })
+
+
+def quitar_del_carrito(producto):
+    st.session_state["seleccionados"] = [
+        x for x in st.session_state["seleccionados"] if x["Producto"] != producto
+    ]
+
+
+def generar_mensaje_whatsapp(items):
+    if not items:
+        return ""
+
+    lineas = []
+    total = 0
+
+    for item in items:
+        subtotal = item["Cantidad"] * item["Venta"]
+        total += subtotal
+        lineas.append(f"{item['Cantidad']} uni de {item['Producto']}")
+        lineas.append(f"Precio unitario: {formato_pesos(item['Venta'])}")
+        lineas.append("")
+
+    lineas.append(f"TOTAL DEL PEDIDO: {formato_pesos(total)}")
+
+    return "\n".join(lineas)
+
+
+def generar_mensaje_producto(producto, venta):
+    mensaje = f"1 uni de {producto}\nPrecio unitario: {formato_pesos(venta)}"
+    return urllib.parse.quote(mensaje)
+
+def exportar_productos_csv(productos):
+    if not productos:
+        return None
+
+    df_export = pd.DataFrame(productos).copy()
+
+    columnas_deseadas = ["Producto", "Costo", "Ganancia", "Venta", "Aumento"]
+    columnas_presentes = [c for c in columnas_deseadas if c in df_export.columns]
+    df_export = df_export[columnas_presentes]
+
+    df_export = df_export.rename(columns={
+        "Producto": "Producto",
+        "Costo": "Precio Costo",
+        "Ganancia": "Margen / Ganancia",
+        "Venta": "Precio Venta",
+        "Aumento": "Aumentó"
+    })
+
+    return df_export.to_csv(
+        index=False,
+        sep=";",
+        encoding="utf-8-sig"
+    ).encode("utf-8-sig")
+
+# =========================
+# HEADER
+# =========================
+st.markdown('<div class="header-card">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Valentín Pet Food</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Sistema de precios automático</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+if st.session_state["ultima_actualizacion"]:
+    st.info(f"🕒 Última actualización: {st.session_state['ultima_actualizacion']}")
+
+# =========================
+# BUSCADOR + ACCIONES
+# =========================
+col1, col2, col3, col4, col5 = st.columns([3.2, 1, 1, 1, 1.2])
+
+with col1:
+    busqueda = st.text_input("Buscar producto")
+
+with col2:
+    if st.button("Reglas"):
+        st.session_state["mostrar_reglas"] = not st.session_state["mostrar_reglas"]
+
+with col3:
+    if st.button("Actualizar"):
+        precios_previos = {}
+        for p in st.session_state["productos_cacheados"]:
+            if "Producto" in p and "Venta" in p:
+                precios_previos[p["Producto"]] = p["Venta"]
+
+        st.session_state["precios_anteriores"] = precios_previos
+
+        cargar_productos.clear()
+        productos = cargar_productos()
+
+        productos_aumentados = []
+
+        for p in productos:
+            ganancia, venta = calcular_precio_venta(
+                p["Costo"],
+                p["Peso"],
+                st.session_state["reglas"]
+            )
+
+            p["Ganancia"] = ganancia
+            p["Venta"] = venta
+
+            precio_anterior = st.session_state["precios_anteriores"].get(p["Producto"], None)
+
+            if precio_anterior is not None and venta > precio_anterior:
+                p["Aumento"] = True
+                productos_aumentados.append(p)
+            else:
+                p["Aumento"] = False
+
+        st.session_state["productos_cacheados"] = productos
+        st.session_state["productos_aumentados"] = productos_aumentados
+        st.session_state["hubo_aumento"] = len(productos_aumentados) > 0
+        st.session_state["ultima_actualizacion"] = datetime.now(zona).strftime("%d/%m/%Y - %H:%M hs")
+
+        if len(productos_aumentados) > 0:
+            st.session_state["productos_mostrados"] = productos_aumentados
+        else:
+            productos_old_prince = [
+                p for p in productos
+                if "OLD PRINCE" in str(p["Producto"]).upper()
+            ]
+            st.session_state["productos_mostrados"] = productos_old_prince
+
+        guardar_estado()
+        st.rerun()
+
+with col4:
+    if st.button(f"Carrito ({len(st.session_state['seleccionados'])})"):
+        st.session_state["ver_carrito"] = True
+        st.rerun()
+
+with col5:
+    archivo_csv = exportar_productos_csv(st.session_state["productos_cacheados"])
+
+    if archivo_csv:
+        st.download_button(
+            label="📥 Exportar",
+            data=archivo_csv,
+            file_name="listado_productos_valentin_pet_food.csv",
+            mime="text/csv"
+        )
+
+# =========================
+# ALERTA DE AUMENTOS
+# =========================
+if st.session_state["hubo_aumento"]:
+    st.warning("⚠️ Hubo aumentos")
+
+# =========================
+# SECCIÓN REGLAS
+# =========================
+if st.session_state["mostrar_reglas"]:
+    st.markdown('<div class="bloque-reglas">', unsafe_allow_html=True)
+    st.subheader("⚙️ Reglas de cálculo de venta")
+
+    reglas_editadas = st.data_editor(
+        st.session_state["reglas"],
+        num_rows="dynamic",
+        use_container_width=True
+    )
+
+    if st.button("Guardar reglas"):
+        st.session_state["reglas"] = reglas_editadas.copy()
+        guardar_estado()
+        st.success("Reglas guardadas correctamente")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================
+# DATAFRAME A MOSTRAR
+# =========================
+if busqueda and busqueda.strip() != "":
+    df = pd.DataFrame(st.session_state["productos_cacheados"])
+else:
+    if st.session_state["productos_mostrados"]:
+        df = pd.DataFrame(st.session_state["productos_mostrados"])
+    else:
+        df = pd.DataFrame()
+
+# =========================
+# FILTRO
+# =========================
+if not df.empty and busqueda:
+    df = df[df["Producto"].str.contains(busqueda, case=False, na=False)]
+
+if not df.empty:
+    df = df.sort_values("Producto")
+    df = df.head(30)
+
+# =========================
+# CARRITO
+# =========================
+if st.session_state["ver_carrito"]:
+    st.markdown("<h2>🛒 Carrito</h2>", unsafe_allow_html=True)
+
+    if not st.session_state["seleccionados"]:
+        st.info("El carrito está vacío.")
+    else:
+        total_general = 0
+
+        for idx, item in enumerate(st.session_state["seleccionados"]):
+            subtotal = item["Cantidad"] * item["Venta"]
+            total_general += subtotal
+
+            col1, col2, col3, col4 = st.columns([5, 1.2, 1.5, 1])
+
+            with col1:
+                st.write(f"**{item['Producto']}**")
+                st.caption(f"Precio unitario: {formato_pesos(item['Venta'])}")
+                st.write(f"Subtotal: **{formato_pesos(subtotal)}**")
+
+            with col2:
+                nueva_cantidad = st.number_input(
+                    "Cant.",
+                    min_value=1,
+                    step=1,
+                    value=item["Cantidad"],
+                    key=f"cant_{idx}"
+                )
+                item["Cantidad"] = nueva_cantidad
+
+            with col3:
+                st.write(f"**{formato_pesos(subtotal)}**")
+
+            with col4:
+                if st.button("❌", key=f"del_{item['Producto']}"):
+                    quitar_del_carrito(item["Producto"])
+                    st.rerun()
+
+        st.markdown(f"### TOTAL: {formato_pesos(total_general)}")
+
+        mensaje = generar_mensaje_whatsapp(st.session_state["seleccionados"])
+        mensaje_codificado = urllib.parse.quote(mensaje)
+        whatsapp_url = f"https://wa.me/?text={mensaje_codificado}"
+
+        st.markdown(f"[📲 Enviar pedido por WhatsApp]({whatsapp_url})")
+
+    if st.button("⬅️ Volver"):
+        st.session_state["ver_carrito"] = False
+        st.rerun()
+
+    st.stop()
+
+# =========================
+# PRODUCTOS
+# =========================
+if df.empty:
+    st.info("Todavía no hay productos para mostrar. Presioná 'Actualizar'.")
+else:
+    for _, row in df.iterrows():
+        st.write(f"**{row['Producto']}**")
+        st.write(f"{formato_pesos(row['Venta'])}")
+        if st.button("Agregar", key=row["Producto"]):
+            agregar_al_carrito(row["Producto"], row["Venta"])
