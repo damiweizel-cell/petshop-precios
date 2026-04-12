@@ -262,10 +262,14 @@ st.markdown("""
             .section-subtitle {
                 font-size: 14px;
             }    
-  /* =========================
+/* =========================
    BOTÓN EXPORTAR (DOWNLOAD)
 ========================= */
 div[data-testid="stDownloadButton"] button {
+    color: #000000 !important;
+}
+
+div[data-testid="stDownloadButton"] button * {
     color: #000000 !important;
 }
         }
