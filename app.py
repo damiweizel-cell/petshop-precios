@@ -269,10 +269,14 @@ div[data-testid="stDownloadButton"] button {
     color: #000000 !important;
 }
 
-div[data-testid="stDownloadButton"] button * {
+div[data-testid="stDownloadButton"] button span {
     color: #000000 !important;
 }
-        }
+
+div[data-testid="stDownloadButton"] button p {
+    color: #000000 !important;
+}
+
         /* =========================
    NUMBER INPUT CARRITO
 ========================= */
