@@ -522,6 +522,14 @@ with col3:
                 "costo_anterior": precio_anterior,
                 "costo_actual": venta,
                 "porcentaje": round(porcentaje, 2)
+                  # 🔥 AGREGAR ESTO
+                 "reglas": st.session_state.get("reglas").to_dict(orient="records")
+                  if isinstance(st.session_state.get("reglas"), pd.DataFrame)
+                   else []
+    }
+
+    with open(ARCHIVO_ESTADO, "w", encoding="utf-8") as f:
+        json.dump(estado, f, ensure_ascii=False, indent=2)  
              })
 
         else:
