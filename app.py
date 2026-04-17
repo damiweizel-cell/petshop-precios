@@ -458,7 +458,6 @@ def exportar_productos_csv(productos):
 
     output.seek(0)
     return output
-
 # =========================
 # HEADER
 # =========================
@@ -513,24 +512,15 @@ with col3:
                 p["Aumento"] = True
                 productos_aumentados.append(p)
 
-                # 🔥 GUARDAR HISTORIAL
                 porcentaje = ((venta - precio_anterior) / precio_anterior) * 100
 
                 st.session_state["historial_aumentos"].append({
-                "fecha": datetime.now(zona).strftime("%d/%m/%Y %H:%M"),
-                "producto": p["Producto"],
-                "costo_anterior": precio_anterior,
-                "costo_actual": venta,
-                "porcentaje": round(porcentaje, 2)
-                  # 🔥 AGREGAR ESTO
-                 "reglas": st.session_state.get("reglas").to_dict(orient="records")
-                  if isinstance(st.session_state.get("reglas"), pd.DataFrame)
-                   else []
-    }
-
-    with open(ARCHIVO_ESTADO, "w", encoding="utf-8") as f:
-        json.dump(estado, f, ensure_ascii=False, indent=2)  
-             })
+                    "fecha": datetime.now(zona).strftime("%d/%m/%Y %H:%M"),
+                    "producto": p["Producto"],
+                    "costo_anterior": precio_anterior,
+                    "costo_actual": venta,
+                    "porcentaje": round(porcentaje, 2)
+                })
 
         else:
             p["Aumento"] = False
@@ -570,7 +560,6 @@ with col5:
             color: #000000 !important;
             font-weight: 700;
         }
-        
         </style>
         """, unsafe_allow_html=True)
 
@@ -651,11 +640,9 @@ if st.session_state["ver_historial"]:
 # =========================
 # DATAFRAME A MOSTRAR
 # =========================
-# 🔍 Si hay búsqueda → usar TODO el catálogo
 if busqueda and busqueda.strip() != "":
     df = pd.DataFrame(st.session_state["productos_cacheados"])
 else:
-    # 📊 Comportamiento normal (como ya venía funcionando)
     if st.session_state["productos_mostrados"]:
         df = pd.DataFrame(st.session_state["productos_mostrados"])
     else:
@@ -673,36 +660,21 @@ if not df.empty and busqueda:
 if not df.empty:
     df = df.sort_values("Producto")
     df = df.head(30)
-# =========================
-# FILTRO
-# =========================
-if not df.empty and busqueda:
-    df = df[df["Producto"].str.contains(busqueda, case=False, na=False)]
-
-if not df.empty:
-    df = df.sort_values("Producto")
-    df = df.head(30)
 
 # =========================
 # CARRITO
 # =========================
 if st.session_state["ver_carrito"]:
-    st.markdown(
-        "<h2 style='color:#111827; margin-bottom: 12px;'>🛒 Carrito</h2>",
-        unsafe_allow_html=True
-    )
+    st.markdown("<h2 style='color:#111827;'>🛒 Carrito</h2>", unsafe_allow_html=True)
 
     if not st.session_state["seleccionados"]:
         st.info("El carrito está vacío.")
-
     else:
         total_general = 0
 
         for idx, item in enumerate(st.session_state["seleccionados"]):
             subtotal = item["Cantidad"] * item["Venta"]
             total_general += subtotal
-
-            st.markdown('<div class="carrito-item">', unsafe_allow_html=True)
 
             col1, col2, col3, col4 = st.columns([5, 1.2, 1.5, 1])
 
@@ -722,174 +694,34 @@ if st.session_state["ver_carrito"]:
                 item["Cantidad"] = nueva_cantidad
 
             with col3:
-                st.write("")
-                st.write("")
                 st.write(f"**{formato_pesos(subtotal)}**")
 
             with col4:
-                st.write("")
-                st.write("")
                 if st.button("❌", key=f"del_{item['Producto']}"):
                     quitar_del_carrito(item["Producto"])
                     st.rerun()
 
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.write(f"### TOTAL: {formato_pesos(total_general)}")
 
-        st.markdown(f"""
-            <div class="carrito-total">
-                <div class="carrito-total-label">TOTAL DEL PEDIDO</div>
-                <div class="carrito-total-value">{formato_pesos(total_general)}</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        mensaje = generar_mensaje_whatsapp(st.session_state["seleccionados"])
-        mensaje_codificado = urllib.parse.quote(mensaje)
-        whatsapp_url = f"https://wa.me/?text={mensaje_codificado}"
-
-        st.markdown(
-            f"""
-            <a href="{whatsapp_url}" target="_blank" class="boton-enviar-fijo">
-                📲 Enviar pedido por WhatsApp
-            </a>
-            """,
-            unsafe_allow_html=True
-        )
-
-    colv1, colv2 = st.columns(2)
-
-    with colv1:
-        if st.button("⬅️ Volver al catálogo", use_container_width=True):
-            st.session_state["ver_carrito"] = False
-            st.rerun()
-
-    with colv2:
-        if st.button("🗑 Vaciar carrito", use_container_width=True):
-            st.session_state["seleccionados"] = []
-            st.rerun()
+    if st.button("⬅️ Volver"):
+        st.session_state["ver_carrito"] = False
+        st.rerun()
 
     st.stop()
 
 # =========================
-# PRODUCTOS CON AUMENTO
+# CATÁLOGO
 # =========================
-if not df.empty and "Aumento" in df.columns and st.session_state["hubo_aumento"]:
-    productos_aumento = df[df["Aumento"] == True]
-else:
-    productos_aumento = pd.DataFrame()
-
-if not productos_aumento.empty:
-    st.markdown(
-        "<h2 style='color:#B91C1C; margin-bottom: 10px;'>📈 Productos con aumento</h2>",
-        unsafe_allow_html=True
-    )
-
-    for _, row in productos_aumento.iterrows():
-        st.markdown(f"""
-            <div class="bloque-aumento">
-                <div class="titulo-aumento">{row['Producto']}</div>
-                <div class="texto-aumento">
-                    Nuevo precio: {formato_pesos(row['Venta'])}
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-# =========================
-# CATÁLOGO PRINCIPAL
-# =========================
-st.markdown(
-    "<h2 style='color:#111827; margin-bottom: 12px;'>📦 Productos</h2>",
-    unsafe_allow_html=True
-)
+st.markdown("<h2 style='color:#111827;'>📦 Productos</h2>", unsafe_allow_html=True)
 
 if df.empty:
-    st.info("Todavía no hay productos para mostrar. Presioná 'Actualizar'.")
-
+    st.info("No hay productos para mostrar.")
 else:
-    for i, row in df.iterrows():
+    for _, row in df.iterrows():
+        st.write(f"**{row['Producto']}**")
+        st.write(f"Costo: {formato_pesos(row['Costo'])}")
+        st.write(f"Venta: {formato_pesos(row['Venta'])}")
 
-        if row.get("Aumento"):
-            nombre_html = f"{row['Producto']} <span style='color:#DC2626; font-weight:900;'>▲ Aumentó</span>"
-        else:
-            nombre_html = row['Producto']
-
-        st.markdown(
-            f"""
-            <div style="
-                font-size:17px;
-                font-weight:800;
-                color:#111827;
-                margin-bottom:2px;
-                line-height:1.25;
-            ">
-                {nombre_html}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.markdown(
-            f"""
-            <div style="
-                font-size:13px;
-                color:#374151;
-                margin-bottom:8px;
-            ">
-                {formato_pesos(row['Costo'])} · {formato_pesos(row['Ganancia'])}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        col1, col2, col3 = st.columns([1.2, 0.9, 0.9])
-
-        with col1:
-            st.markdown(
-                f"""
-                <div style="
-                    font-size:18px;
-                    font-weight:900;
-                    color:#166534;
-                    background:#DCFCE7;
-                    padding:10px 14px;
-                    border-radius:12px;
-                    display:inline-block;
-                    min-width:110px;
-                    text-align:center;
-                    margin-bottom:8px;
-                ">
-                    {formato_pesos(row['Venta'])}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        with col2:
-            if st.button("Agregar", key=f"add_{row['Producto']}"):
-                agregar_al_carrito(row["Producto"], row["Venta"])
-                st.toast("Agregado al carrito")
-
-        with col3:
-            mensaje_producto = generar_mensaje_producto(row["Producto"], row["Venta"])
-            whatsapp_url_producto = f"https://wa.me/?text={mensaje_producto}"
-
-            st.markdown(
-                f"""
-                <div style="display:flex; justify-content:center; align-items:center; margin-top:2px;">
-                    <a href="{whatsapp_url_producto}" target="_blank" class="boton-enviar-fijo">
-                        Enviar
-                    </a>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        st.markdown(
-            """
-            <hr style="
-                border:0;
-                border-top:1px solid rgba(17,24,39,0.10);
-                margin:8px 0 14px 0;
-            ">
-            """,
-            unsafe_allow_html=True
-        )
+        if st.button("Agregar", key=row["Producto"]):
+            agregar_al_carrito(row["Producto"], row["Venta"])
+            st.success("Agregado al carrito")
