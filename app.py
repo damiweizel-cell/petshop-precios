@@ -36,6 +36,7 @@ def guardar_estado():
         "productos_aumentados": st.session_state.get("productos_aumentados", []),
         "hubo_aumento": st.session_state.get("hubo_aumento", False),
         "productos_mostrados": st.session_state.get("productos_mostrados", []),
+        "historial_aumentos": st.session_state.get("historial_aumentos", []),
         "reglas": st.session_state.get("reglas").to_dict(orient="records")
         if isinstance(st.session_state.get("reglas"), pd.DataFrame)
         else []
@@ -333,6 +334,7 @@ if "estado_cargado" not in st.session_state:
         st.session_state["productos_aumentados"] = estado_guardado.get("productos_aumentados", [])
         st.session_state["hubo_aumento"] = estado_guardado.get("hubo_aumento", False)
         st.session_state["productos_mostrados"] = estado_guardado.get("productos_mostrados", [])
+        st.session_state["historial_aumentos"] = estado_guardado.get("historial_aumentos", [])
 
         reglas_guardadas = estado_guardado.get("reglas", [])
         if reglas_guardadas:
