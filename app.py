@@ -705,22 +705,23 @@ if st.session_state["ver_carrito"]:
 
         st.write(f"### TOTAL: {formato_pesos(total_general)}")
 
-    mensaje = generar_mensaje_whatsapp(st.session_state["seleccionados"])
-mensaje_encoded = urllib.parse.quote(mensaje)
+        # ✅ BOTÓN WHATSAPP (SOLO SI HAY PRODUCTOS)
+        mensaje = generar_mensaje_whatsapp(st.session_state["seleccionados"])
+        mensaje_encoded = urllib.parse.quote(mensaje)
 
-link = f"https://wa.me/?text={mensaje_encoded}"
+        link = f"https://wa.me/?text={mensaje_encoded}"
 
-st.markdown(
-    f'<a href="{link}" target="_blank" class="boton-enviar-fijo">📲 Enviar pedido por WhatsApp</a>',
-    unsafe_allow_html=True
-)
+        st.markdown(
+            f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar pedido por WhatsApp</a>',
+            unsafe_allow_html=True
+        )
 
-if st.button("Volver"):
-    st.session_state["ver_carrito"] = False
-    st.rerun()
+    if st.button("Volver"):
+        st.session_state["ver_carrito"] = False
+        st.rerun()
 
     st.stop()
-
+    
 # =========================
 # CATÁLOGO
 # =========================
@@ -736,17 +737,16 @@ else:
 
         colA, colB = st.columns([1,1])
 
-with colA:
-    if st.button("Agregar", key=row["Producto"]):
-        agregar_al_carrito(row["Producto"], row["Venta"])
-        st.success("Agregado al carrito")
+        with colA:
+            if st.button("Agregar", key=f"add_{row['Producto']}"):
+                agregar_al_carrito(row["Producto"], row["Venta"])
+                st.success("Agregado al carrito")
 
-with colB:
-    mensaje = generar_mensaje_producto(row["Producto"], row["Venta"])
+        with colB:
+            mensaje = generar_mensaje_producto(row["Producto"], row["Venta"])
+            link = f"https://wa.me/?text={mensaje}"
 
-    link = f"https://wa.me/?text={mensaje}"
-
-    st.markdown(
-        f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
-        unsafe_allow_html=True
-    )
+            st.markdown(
+                f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
+                unsafe_allow_html=True
+            )
