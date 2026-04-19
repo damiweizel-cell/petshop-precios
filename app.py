@@ -715,9 +715,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-    if st.button("Volver"):
-        st.session_state["ver_carrito"] = False
-        st.rerun()
+if st.button("Volver"):
+    st.session_state["ver_carrito"] = False
+    st.rerun()
 
     st.stop()
 
