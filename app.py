@@ -499,28 +499,28 @@ with col3:
         productos_aumentados = []
 
         for p in productos:
-    p["Aumento"] = False
-
-    peso = extraer_peso(p["Producto"])
-
-    ganancia, venta = calcular_precio_venta(
-        p["Costo"],
-        peso,
-        st.session_state["reglas"]
-    )
-
-    # VALIDACIÓN
-    if (
-        peso < 1
-        or venta is None
-        or venta <= p["Costo"]
-    ):
-        p["Ganancia"] = "-"
-        p["Venta"] = "A consultar"
-    else:
-        p["Ganancia"] = ganancia
-        p["Venta"] = venta
-        precio_anterior = st.session_state["precios_anteriores"].get(p["Producto"], None)
+        p["Aumento"] = False
+    
+        peso = extraer_peso(p["Producto"])
+    
+        ganancia, venta = calcular_precio_venta(
+            p["Costo"],
+            peso,
+            st.session_state["reglas"]
+        )
+    
+        # VALIDACIÓN
+        if (
+            peso < 1
+            or venta is None
+            or venta <= p["Costo"]
+        ):
+            p["Ganancia"] = "-"
+            p["Venta"] = "A consultar"
+        else:
+            p["Ganancia"] = ganancia
+            p["Venta"] = venta
+            precio_anterior = st.session_state["precios_anteriores"].get(p["Producto"], None)
 
         if precio_anterior is not None and venta > precio_anterior:
             p["Aumento"] = True
