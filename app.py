@@ -770,8 +770,3 @@ else:
                 )
             else:
                 st.button("Enviar", disabled=True)
-            
-                st.markdown(
-                    f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
-                    unsafe_allow_html=True
-                )
