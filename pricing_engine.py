@@ -22,14 +22,24 @@ def obtener_margen(peso, reglas_df):
 
 
 def calcular_precio_venta(costo, peso, reglas_df):
+
+    # ❌ SI EL PESO ES INVÁLIDO → NO CALCULAR
+    if peso is None or peso < 1:
+        return None, None
+
     margen_regla = obtener_margen(peso, reglas_df)
 
-    # ✅ SI NO HAY REGLA → NO CALCULAR
+    # ❌ SI NO HAY REGLA → NO CALCULAR
     if margen_regla is None:
         return None, None
 
     venta_base = costo + margen_regla
     venta_redondeada = redondear_a_1000_inferior(venta_base)
+
+    # ❌ SI EL PRECIO QUEDA MENOR O IGUAL AL COSTO → INVALIDAR
+    if venta_redondeada <= costo:
+        return None, None
+
     ganancia_real = venta_redondeada - costo
 
     return ganancia_real, venta_redondeada
