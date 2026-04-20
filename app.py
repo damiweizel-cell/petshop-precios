@@ -9,7 +9,7 @@ import os
 from pricing_engine import (
     formato_pesos,
     calcular_precio_venta,
-    obtener_reglas_iniciales
+    obtener_reglas_iniciales,
     extraer_peso
 )
 
