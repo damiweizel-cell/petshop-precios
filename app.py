@@ -499,9 +499,11 @@ with col3:
 
         for p in productos:
             p["Aumento"] = False
+            peso = extraer_peso(p["Producto"])
+
             ganancia, venta = calcular_precio_venta(
                 p["Costo"],
-                p["Peso"],
+                peso,
                 st.session_state["reglas"]
             )
 
