@@ -509,7 +509,7 @@ with col3:
         st.session_state["reglas"]
     )
 
-    # 🚨 VALIDACIÓN FINAL (ANTI-ERRORES)
+    # VALIDACIÓN
     if (
         peso < 1
         or venta is None
@@ -520,7 +520,6 @@ with col3:
     else:
         p["Ganancia"] = ganancia
         p["Venta"] = venta
-
         precio_anterior = st.session_state["precios_anteriores"].get(p["Producto"], None)
 
         if precio_anterior is not None and venta > precio_anterior:
