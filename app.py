@@ -769,8 +769,7 @@ else:
                     unsafe_allow_html=True
                 )
             else:
-                st.caption("Precio a consultar")
-                link = f"https://wa.me/?text={mensaje}"
+                st.button("Enviar", disabled=True)
             
                 st.markdown(
                     f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
