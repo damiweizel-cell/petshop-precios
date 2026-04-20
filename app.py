@@ -675,6 +675,7 @@ if not df.empty and busqueda:
 # =========================
 if not df.empty:
     df = df.sort_values("Producto")
+if not busqueda:
     df = df.head(30)
 
 # =========================
@@ -764,13 +765,12 @@ else:
                 st.success("Agregado al carrito")
 
         with colB:
-            if isinstance(row["Venta"], (int, float)):
-                mensaje = generar_mensaje_producto(row["Producto"], row["Venta"])
-                link = f"https://wa.me/?text={mensaje}"
-            
-                st.markdown(
-                    f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
-                    unsafe_allow_html=True
-                )
-            else:
-                st.button("Enviar", disabled=True, key=f"send_disabled_{row['Producto']}")
+            mensaje = generar_mensaje_producto(row["Producto"], row["Venta"])
+            link = f"https://wa.me/?text={mensaje}"
+        
+            st.link_button(
+                "Enviar",
+                link,
+                key=f"send_{row['Producto']}",
+                use_container_width=True
+            )
