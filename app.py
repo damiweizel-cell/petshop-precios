@@ -769,4 +769,4 @@ else:
                     unsafe_allow_html=True
                 )
             else:
-                st.button("Enviar", disabled=True)
+                st.button("Enviar", disabled=True, key=f"send_disabled_{row['Producto']}")
