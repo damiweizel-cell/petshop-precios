@@ -503,24 +503,21 @@ with col3:
 
             peso = extraer_peso(p["Producto"])
 
-ganancia, venta = calcular_precio_venta(
-    p["Costo"],
-    peso,
-    st.session_state["reglas"]
-)
-
-# 🚨 VALIDACIÓN FINAL (ANTI-ERRORES)
-if (
-    peso < 1
-    or venta is None
-    or venta <= p["Costo"]
-):
-    p["Ganancia"] = "-"
-    p["Venta"] = "A consultar"
-else:
-    p["Ganancia"] = ganancia
-    p["Venta"] = venta
-
+        ganancia, venta = calcular_precio_venta(
+            p["Costo"],
+            peso,
+            st.session_state["reglas"]
+        )
+        
+        # 🚨 VALIDACIÓN FINAL (ANTI-ERRORES)
+        if (
+            peso < 1
+            or venta is None
+            or venta <= p["Costo"]
+        ):
+            p["Ganancia"] = "-"
+            p["Venta"] = "A consultar"
+        else:
             p["Ganancia"] = ganancia
             p["Venta"] = venta
 
