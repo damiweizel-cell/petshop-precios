@@ -746,7 +746,14 @@ else:
     for _, row in df.iterrows():
         st.write(f"**{row['Producto']}**")
         st.write(f"Costo: {formato_pesos(row['Costo'])}")
-        st.write(f"Venta: {formato_pesos(row['Venta'])}")
+        venta = row["Venta"]
+
+        if isinstance(venta, (int, float)):
+            venta_mostrar = formato_pesos(venta)
+        else:
+            venta_mostrar = "A consultar"
+        
+        st.write(f"Venta: {venta_mostrar}")
 
         colA, colB = st.columns([1,1])
 
@@ -756,7 +763,16 @@ else:
                 st.success("Agregado al carrito")
 
         with colB:
-            mensaje = generar_mensaje_producto(row["Producto"], row["Venta"])
+            if isinstance(row["Venta"], (int, float)):
+                mensaje = generar_mensaje_producto(row["Producto"], row["Venta"])
+                link = f"https://wa.me/?text={mensaje}"
+            
+                st.markdown(
+                    f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
+                    unsafe_allow_html=True
+                )
+        else:
+            st.caption("Precio a consultar")
             link = f"https://wa.me/?text={mensaje}"
 
             st.markdown(
