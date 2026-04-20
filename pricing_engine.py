@@ -16,14 +16,22 @@ def obtener_margen(peso, reglas_df):
     for _, regla in reglas_df.iterrows():
         if peso >= regla["Desde kg"] and peso < regla["Hasta kg"]:
             return regla["Incremento"]
-    return 0
+    
+    # ❌ ANTES devolvías 0 → MAL
+    return None
 
 
 def calcular_precio_venta(costo, peso, reglas_df):
     margen_regla = obtener_margen(peso, reglas_df)
+
+    # ✅ SI NO HAY REGLA → NO CALCULAR
+    if margen_regla is None:
+        return None, None
+
     venta_base = costo + margen_regla
     venta_redondeada = redondear_a_1000_inferior(venta_base)
     ganancia_real = venta_redondeada - costo
+
     return ganancia_real, venta_redondeada
 
 
