@@ -537,9 +537,6 @@ with col3:
                         "porcentaje": round(porcentaje, 2)
                     })
 
-        else:
-            p["Aumento"] = False
-
         st.session_state["productos_cacheados"] = productos
         st.session_state["productos_aumentados"] = productos_aumentados
         st.session_state["hubo_aumento"] = len(productos_aumentados) > 0
@@ -771,11 +768,11 @@ else:
                     f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
                     unsafe_allow_html=True
                 )
-        else:
-            st.caption("Precio a consultar")
-            link = f"https://wa.me/?text={mensaje}"
-
-            st.markdown(
-                f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
-                unsafe_allow_html=True
-            )
+            else:
+                st.caption("Precio a consultar")
+                link = f"https://wa.me/?text={mensaje}"
+    
+                st.markdown(
+                    f'<a href="{link}" target="_blank" class="boton-enviar-fijo">Enviar</a>',
+                    unsafe_allow_html=True
+                )
