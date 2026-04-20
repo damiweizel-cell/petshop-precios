@@ -4,6 +4,8 @@ import pandas as pd
 
 
 def formato_pesos(valor):
+    if not isinstance(valor, (int, float)):
+        return "A consultar"
     return f"$ {int(valor):,}".replace(",", ".")
 
 
