@@ -413,7 +413,11 @@ def generar_mensaje_whatsapp(items):
 
 
 def generar_mensaje_producto(producto, venta):
-    mensaje = f"1 uni de {producto}\nPrecio unitario: {formato_pesos(venta)}"
+    if isinstance(venta, (int, float)):
+        mensaje = f"1 uni de {producto}\nPrecio unitario: {formato_pesos(venta)}"
+    else:
+        mensaje = f"1 uni de {producto}\nPrecio: A consultar"
+
     return urllib.parse.quote(mensaje)
 
 def exportar_productos_csv(productos):
